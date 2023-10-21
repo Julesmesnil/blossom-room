@@ -8,6 +8,9 @@ varying vec3 vPosition;
 
 float PI = 3.141592653689793238;
 
+/**
+* VORONOI 2D
+*/
 const mat2 myt = mat2(.12121212, .13131313, -.13131313, .12121212);
 const vec2 mys = vec2(1e4, 1e6);
 
@@ -37,7 +40,6 @@ float voronoi2d(const in vec2 point) {
   }
   return pow(1. / res, 0.0625);
 }
-
 
 void main(){
 

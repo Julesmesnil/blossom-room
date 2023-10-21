@@ -17,3 +17,12 @@ body
     width: 100vw;
     height: 100vh;
 }
+
+/* Resize TweakPane Panel */
+.tp-dfwv{
+    width: 300px !important;
+}
+
+.tp-lblv_v{
+    width: 130px !important;
+}
