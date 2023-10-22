@@ -29,6 +29,7 @@ export default class City extends ShaderMaterial {
 
         _shader.uniforms.uTime = { value: 0 };
         _shader.uniforms.uProgress = { value: 1. };
+        _shader.uniforms.uHeight = { value: 0. };
         _shader.uniforms.resolution = { value: new Vector4() }; 
         // _shader.uniforms.noisetexture = { value: new THREE.TextureLoader().load(noisetexture) };
 
@@ -39,10 +40,11 @@ export default class City extends ShaderMaterial {
         this.userData.shader = _shader;
     }
 
-    update(time, progress) {
+    update(time, progress, height) {
         if (this.userData.shader) {
             this.userData.shader.uniforms.uTime.value = time;
             this.userData.shader.uniforms.uProgress.value = progress;
+            this.userData.shader.uniforms.uHeight.value = height;
         }
     }
 

@@ -25,11 +25,15 @@ export default class World
     {
         // this.resources.items.lennaTexture.encoding = THREE.sRGBEncoding
 
-        this.material = new City()
+        this.material = new City({
+            // wireframe: true,
+        })
 
-        this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1)
+        this.geometry = new THREE.PlaneGeometry(1, 1, 20, 20)
 
         this.plane = new THREE.Mesh(this.geometry, this.material)
+
+        this.plane.rotation.set(-Math.PI * 0.5, 0, 0)
         this.scene.add(this.plane)
     }
 
@@ -45,7 +49,11 @@ export default class World
 
 
         if (this.material) {
-            this.material.update(this.elapsedTime, this.experience.renderer.progress);
+            this.material.update(
+                this.elapsedTime,
+                this.experience.renderer.progress,
+                this.experience.renderer.height,
+            );
         }
     }
 

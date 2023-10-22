@@ -16,7 +16,8 @@ export default class Renderer
         this.scene = this.experience.scene
         this.camera = this.experience.camera
 
-        this.progress = 1.;
+        this.progress = 1;
+        this.height = 0;
 
         // Debug
         if(this.debug)
@@ -75,6 +76,7 @@ export default class Renderer
             this.PARAMS = {
                 background: this.background,
                 progress: this.progress,
+                height: this.height,
             }
 
             // DEBUG FOLDER
@@ -92,6 +94,16 @@ export default class Renderer
                 )
                 .on('change', (ev) => {
                     this.progress = ev.value
+                });
+
+            this.debugFolder
+                .addBinding(
+                    this.PARAMS,
+                    'height',
+                    { min: 0., max: 1., step: 0.01 }
+                )
+                .on('change', (ev) => {
+                    this.height = ev.value
                 });
         }
     }
