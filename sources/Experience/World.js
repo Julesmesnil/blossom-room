@@ -11,6 +11,7 @@ export default class World
         this.config = this.experience.config
         this.scene = this.experience.scene
         this.resources = this.experience.resources
+        this.renderer = this.experience.renderer;
         
         this.resources.on('groupEnd', (_group) =>
         {
@@ -23,7 +24,12 @@ export default class World
 
     setup3D()
     {
-        // this.resources.items.lennaTexture.encoding = THREE.sRGBEncoding
+
+        // // framebuffer pour le Voronoi noise
+        // const textureWidth = 1024;
+        // const textureHeight = 1024;
+        // this.renderTarget = new THREE.WebGLRenderTarget(textureWidth, textureHeight);
+
 
         this.material = new City({
             // wireframe: true,
@@ -47,12 +53,16 @@ export default class World
         this.elapsedTime = window.performance.now() * 0.001;
         this.time = window.performance.now();
 
+        // this.renderer.instance.setRenderTarget(this.renderTarget);
+        // this.renderer.instance.render(this.scene, this.camera.instance);
+        // this.renderer.instance.setRenderTarget(null);
 
         if (this.material) {
             this.material.update(
                 this.elapsedTime,
-                this.experience.renderer.progress,
-                this.experience.renderer.height,
+                this.renderer.progress,
+                this.renderer.height,
+                // this.renderTarget.texture
             );
         }
     }
