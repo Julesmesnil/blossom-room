@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  alea: ^1.0.1
   glsl-noise: ^0.0.0
   glsl-voronoi-noise: ^1.2.2
   glslify: ^7.1.1
@@ -11,8 +12,10 @@ specifiers:
   vite: ^4.5.0
   vite-plugin-glsl: ^0.1.2
   vite-plugin-glslify: ^2.0.2
+  voronoi: ^1.0.0
 
 dependencies:
+  alea: 1.0.1
   glsl-noise: 0.0.0
   glsl-voronoi-noise: 1.2.2
   glslify: 7.1.1
@@ -23,6 +26,7 @@ dependencies:
   vite: 4.5.0_stylus@0.58.1
   vite-plugin-glsl: 0.1.5
   vite-plugin-glslify: 2.0.2_vite@4.5.0
+  voronoi: 1.0.0
 
 packages:
 
@@ -243,6 +247,10 @@ packages:
     resolution: {integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+    dev: false
+
+  /alea/1.0.1:
+    resolution: {integrity: sha512-QU+wv+ziDXaMxRdsQg/aH7sVfWdhKps5YP97IIwFkHCsbDZA3k87JXoZ5/iuemf4ntytzIWeScrRpae8+lDrXA==}
     dev: false
 
   /astring/1.8.6:
@@ -944,6 +952,10 @@ packages:
       stylus: 0.58.1
     optionalDependencies:
       fsevents: 2.3.3
+    dev: false
+
+  /voronoi/1.0.0:
+    resolution: {integrity: sha512-fukJpK8gyTJRJx0yLvtEE9h4B0VxUNZ4OpRimIjYmHd+YTiMTE2IiKYaXADNrviMkNgkEHghQ7OtMBDP+X64ng==}
     dev: false
 
   /word-wrap/1.2.5:

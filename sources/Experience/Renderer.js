@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Alea from 'alea'
 import Experience from './Experience.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -18,6 +19,11 @@ export default class Renderer
 
         this.progress = 1;
         this.height = 0;
+        // this.seed = Math.random();
+        this.seed = 0.8760063868;
+
+        // Alea setup
+        this.prng = new Alea(this.seed);
 
         // Debug
         if(this.debug)
@@ -75,6 +81,7 @@ export default class Renderer
             // PARAMS
             this.PARAMS = {
                 background: this.background,
+                seed: this.seed,
                 progress: this.progress,
                 height: this.height,
             }
@@ -89,22 +96,46 @@ export default class Renderer
             this.debugFolder
                 .addBinding(
                     this.PARAMS,
-                    'progress',
-                    { min: 1., max: 10., step: 0.1 }
+                    'seed',
                 )
                 .on('change', (ev) => {
-                    this.progress = ev.value
+                    this.seed = ev.value
+                    this.prng = new Alea(this.seed);
+
+                    // console.log(this.prng());
                 });
 
-            this.debugFolder
-                .addBinding(
-                    this.PARAMS,
-                    'height',
-                    { min: 0., max: 1., step: 0.01 }
-                )
-                .on('change', (ev) => {
-                    this.height = ev.value
-                });
+            // this.debugFolder
+            //     .addButton({
+            //         title: 'random',
+            //         label: 'random seed',
+            //     })
+            //     .on('click', () => {
+            //         this.seed = Math.floor(Math.random() * .5);
+            //         this.prng = new Alea(this.seed);
+
+            //         // console.log(this.prng());
+            //     });
+
+            // this.debugFolder
+            //     .addBinding(
+            //         this.PARAMS,
+            //         'progress',
+            //         { min: 1., max: 10., step: 0.1 }
+            //     )
+            //     .on('change', (ev) => {
+            //         this.progress = ev.value
+            //     });
+
+            // this.debugFolder
+            //     .addBinding(
+            //         this.PARAMS,
+            //         'height',
+            //         { min: 0., max: 1., step: 0.01 }
+            //     )
+            //     .on('change', (ev) => {
+            //         this.height = ev.value
+            //     });
         }
     }
 

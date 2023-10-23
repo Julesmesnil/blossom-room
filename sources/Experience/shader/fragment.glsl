@@ -44,11 +44,11 @@ float voronoi2d(const in vec2 point) {
 
 void main() {
 
-  vec3 voronoiCoords = vec3(voronoi2d(vUv * uProgress * 5.0));
+  vec3 voronoiCoords = vec3(voronoi2d(vUv * 5.0));
 
   vec3 color = voronoiCoords;
 
 
-  gl_FragColor = vec4(color, 1.0);
+  gl_FragColor = vec4(vUv, 0.0, 1.0);
 
 }
