@@ -16,11 +16,12 @@ export default class Renderer
         this.sizes = this.experience.sizes
         this.scene = this.experience.scene
         this.camera = this.experience.camera
+        this.light = this.experience.light
 
         this.progress = 1;
         this.height = 0;
         // this.seed = Math.random();
-        this.seed = 0.8760063868;
+        this.seed = 0.9580859306;
 
         // Alea setup
         this.prng = new Alea(this.seed);
@@ -42,11 +43,12 @@ export default class Renderer
 
     setInstance()
     {
-        this.background = '#ddf0ff'
+        // this.background = '#ddf0ff'
+        this.background = '#1e3342'
 
         // Renderer
         this.instance = new THREE.WebGLRenderer({
-            alpha: false,
+            // alpha: false,
             antialias: true
         })
         this.instance.domElement.style.position = 'absolute'
@@ -59,13 +61,14 @@ export default class Renderer
         this.instance.setSize(this.config.width, this.config.height)
         this.instance.setPixelRatio(this.config.pixelRatio)
 
-        this.instance.physicallyCorrectLights = true
-        // this.instance.gammaOutPut = true
-        this.instance.outputEncoding = THREE.sRGBEncoding
-        // this.instance.shadowMap.type = THREE.PCFSoftShadowMap
-        // this.instance.shadowMap.enabled = false
-        this.instance.toneMapping = THREE.NoToneMapping
-        this.instance.toneMappingExposure = 1
+        this.instance.physicallyCorrectLights = false
+        // this.instance.outputColorSpace = THREE.SRGBColorSpace
+        this.instance.toneMapping = THREE.ACESFilmicToneMapping
+        this.instance.toneMappingExposure = .8
+        
+        this.instance.shadowMap.enabled = true
+        this.instance.shadowMap.type = THREE.PCFSoftShadowMap
+        // this.instance.shadowMap.autoUpdate = true
 
         this.context = this.instance.getContext()
 
@@ -82,6 +85,7 @@ export default class Renderer
             this.PARAMS = {
                 background: this.background,
                 seed: this.seed,
+                light: this.light,
                 progress: this.progress,
                 height: this.height,
             }
@@ -101,21 +105,7 @@ export default class Renderer
                 .on('change', (ev) => {
                     this.seed = ev.value
                     this.prng = new Alea(this.seed);
-
-                    // console.log(this.prng());
                 });
-
-            // this.debugFolder
-            //     .addButton({
-            //         title: 'random',
-            //         label: 'random seed',
-            //     })
-            //     .on('click', () => {
-            //         this.seed = Math.floor(Math.random() * .5);
-            //         this.prng = new Alea(this.seed);
-
-            //         // console.log(this.prng());
-            //     });
 
             // this.debugFolder
             //     .addBinding(

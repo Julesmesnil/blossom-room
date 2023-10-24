@@ -1,11 +1,11 @@
-import { DoubleSide, ShaderMaterial, Vector4 } from 'three';
+import { DoubleSide, ShaderMaterial, Vector4, MeshStandardMaterial } from 'three';
 
 import vertex from '../shader/vertex.glsl';
 import fragment from '../shader/fragment.glsl';
 
 import glsl from 'glslify';
 
-export default class City extends ShaderMaterial {
+export default class City extends MeshStandardMaterial {
 
     /** 
      * @param {import('three').MeshBasicMaterial} params
@@ -34,10 +34,10 @@ export default class City extends ShaderMaterial {
         // _shader.uniforms.noisetexture = { value: new THREE.TextureLoader().load(noisetexture) };
 
 
-        _shader.vertexShader = vertex;
-        _shader.fragmentShader = fragment;
+        // _shader.vertexShader = vertex;
+        // _shader.fragmentShader = fragment;
 
-        this.userData.shader = _shader;
+        // this.userData.shader = _shader;
     }
 
     update(time, progress, height) {

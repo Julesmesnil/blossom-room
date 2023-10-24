@@ -8,6 +8,7 @@ import Stats from './Utils/Stats.js'
 import Resources from './Resources.js'
 import Renderer from './Renderer.js'
 import Camera from './Camera.js'
+import Light from './Light.js'
 import World from './World.js'
 
 import assets from './assets.js'
@@ -41,6 +42,7 @@ export default class Experience
         this.setScene()
         this.setCamera()
         this.setRenderer()
+        this.setLight()
         this.setResources()
         this.setWorld()
         
@@ -96,6 +98,15 @@ export default class Experience
         this.camera = new Camera()
     }
 
+    setLight()
+    {
+        this.light = new Light()
+        if(this.config.debug)
+        {
+            this.light.debugFolder()
+        }
+    }
+
     setRenderer()
     {
         this.renderer = new Renderer({ rendererInstance: this.rendererInstance })
@@ -119,6 +130,7 @@ export default class Experience
             this.stats.update()
         
         this.camera.update()
+        // this.light.update()
 
         if(this.world)
             this.world.update()

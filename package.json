@@ -19,5 +19,8 @@
     "vite-plugin-glsl": "^0.1.2",
     "vite-plugin-glslify": "^2.0.2",
     "voronoi": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.157.2"
   }
 }
