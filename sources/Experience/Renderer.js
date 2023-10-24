@@ -20,7 +20,7 @@ export default class Renderer
         this.progress = 1;
         this.height = 0;
         // this.seed = Math.random();
-        this.seed = 0.8760063868;
+        this.seed = .8760063868;
 
         // Alea setup
         this.prng = new Alea(this.seed);
@@ -47,7 +47,11 @@ export default class Renderer
         // Renderer
         this.instance = new THREE.WebGLRenderer({
             alpha: false,
-            antialias: true
+            antialias: true,
+            shadowMap: {
+                enabled: true,
+                type: THREE.PCFSoftShadowMap,
+            }
         })
         this.instance.domElement.style.position = 'absolute'
         this.instance.domElement.style.top = 0
