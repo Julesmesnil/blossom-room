@@ -3,6 +3,7 @@ import Voronoi from 'voronoi'
 import Experience from './Experience.js'
 
 import City from './Components/City.js'
+import Flowers from './Components/Flowers.js'
 
 export default class World
 {
@@ -18,6 +19,7 @@ export default class World
         this.pointAmount = 100; // debugeur
         this.voronoi = new Voronoi();
         this.bbox = { xl: 0, xr: 2, yt: 2, yb: 0 };
+        this.createPoints();
 
         // Set up
         this.mode = 'debug'
@@ -32,6 +34,29 @@ export default class World
                 this.setup3D()
             }
         })
+    }
+
+    addLights(){
+
+        const light1 = new THREE.AmbientLight( 0xffffff, 0.3 );
+        this.scene.add( light1 );
+
+        this.light2 = new THREE.DirectionalLight( 0xffffff, 0.8 * Math.PI );
+        this.light2.castShadow = true;
+        this.light2.shadow.camera.near = .1;
+        this.light2.shadow.camera.far = 20;
+        this.light2.shadow.bias = - 0.01;
+        this.light2.shadow.camera.right = 10;
+        this.light2.shadow.camera.left = - 10;
+        this.light2.shadow.camera.top	= 10;
+        this.light2.shadow.camera.bottom = - 10;
+
+        this.light2.shadow.mapSize.width = 2048;
+        this.light2.shadow.mapSize.height = 2048;
+        this.light2.position.set(2.7, 3, 0); // ~60°
+
+        this.scene.add( this.light2 );
+
     }
 
     createPoints()
@@ -113,6 +138,7 @@ export default class World
                 this.cubeArray.push(cube);
             }
         }
+        console.log(this.cubeArray.length);
     }
 
     createScene()
@@ -147,6 +173,7 @@ export default class World
 
     setup3D()
     {
+        
         this.material = new City({
             // wireframe: true,
         })
@@ -159,6 +186,7 @@ export default class World
         this.plane.position.set(0, -.5, -1)
         this.scene.add(this.plane)
 
+        this.flowers = new Flowers({})
     }
 
     resize()
