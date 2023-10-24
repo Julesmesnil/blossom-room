@@ -15,7 +15,7 @@ export default class Flowers
         this.world = this.experience.world;
         console.log(this.world)
 
-        this.count = 10000;
+        this.count = 50000;
         this.ages = new Float32Array(this.count);
         this.scales = new Float32Array(this.count);
         this.dummy = new THREE.Object3D();
@@ -54,7 +54,7 @@ export default class Flowers
 
             this.defaultTransform = new THREE.Matrix4()
                 .makeRotationX( Math.PI )
-                .multiply( new THREE.Matrix4().makeScale( .05, .05, .05 ) );
+                .multiply( new THREE.Matrix4().makeScale( .03, .03, .03 ) );
 
             // Apply default transform to geometries.
             this.stemGeometry.applyMatrix4( this.defaultTransform );
