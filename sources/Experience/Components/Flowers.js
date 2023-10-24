@@ -35,14 +35,20 @@ export default class Flowers
         this.loader = new GLTFLoader();
         this.loader.load('/assets/Flower.glb', (gltf) =>{
 
+        
+            // Flower gltf
             this.flower = gltf.scene;
             this.flower.traverse((o) => {
                 if (o.isMesh) {
                     o.castShadow = o.receiveShadow = true;
                 }
             });
+
+            // Flower Meshes
             this._stemMesh = this.flower.getObjectByName('Stem');
             this._blossomMesh = this.flower.getObjectByName('Blossom');
+
+            // Flower Geometries
             this.stemGeometry = this._stemMesh.geometry.clone();
             this.blossomGeometry = this._blossomMesh.geometry.clone();
 
@@ -50,9 +56,11 @@ export default class Flowers
                 .makeRotationX( Math.PI )
                 .multiply( new THREE.Matrix4().makeScale( .05, .05, .05 ) );
 
+            // Apply default transform to geometries.
             this.stemGeometry.applyMatrix4( this.defaultTransform );
             this.blossomGeometry.applyMatrix4( this.defaultTransform );
 
+            // Flower Materials
             this.stemMaterial = this._stemMesh.material;
             this.blossomMaterial = this._blossomMesh.material;
 
@@ -82,6 +90,10 @@ export default class Flowers
             this.update()
 
         });
+
+        this.loader.load('/assets/margarita.glb', (gltf) =>{
+            console.log(gltf.scene.children[0])
+        })
 
     }
 
