@@ -130,13 +130,15 @@ export default class Experience
             this.stats.update()
         
         this.camera.update()
-        // this.light.update()
 
         if(this.world)
             this.world.update()
         
         if(this.renderer)
             this.renderer.update()
+
+        if(this.light)
+            this.light.update()
 
         window.requestAnimationFrame(() =>
         {

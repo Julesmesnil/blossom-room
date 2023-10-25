@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import Voronoi from 'voronoi'
 import Experience from './Experience.js'
 
-import City from './Components/City.js'
+import Sky from './Components/Sky.js'
 import Flowers from './Components/Flowers.js'
 
 export default class World
@@ -11,6 +11,7 @@ export default class World
     {
         this.experience = new Experience()
         this.config = this.experience.config
+        this.debug = this.experience.debug
         this.scene = this.experience.scene
         this.resources = this.experience.resources
         this.renderer = this.experience.renderer
@@ -21,6 +22,9 @@ export default class World
         this.bbox = { xl: 0, xr: 2, yt: 2, yb: 0 };
         this.createPoints();
 
+        // room default color
+        this.roomColor = this.floatToRandomHexColor()
+
         // Set up
         this.mode = 'debug'
 
@@ -28,35 +32,63 @@ export default class World
         {
             if(_group.name === 'base')
             {
-                this.createPoints();
-                this.createFloors();
-                this.createScene();
+                this.createPoints()
+                this.createFloors()
+                this.createRoom()
+                this.createSky()
+                this.debugFolder() // Debug
                 this.setup3D()
             }
         })
     }
 
-    addLights(){
+    floatToRandomHexColor() {
+        let r = Math.floor(this.renderer.prng() * 256);
+        let g = Math.floor(this.renderer.prng() * 256);
+        let b = Math.floor(this.renderer.prng() * 256);
+      
+        let rHex = r.toString(16);
+        let gHex = g.toString(16);
+        let bHex = b.toString(16);
+      
+        if (rHex.length < 2) {
+          rHex = "0" + rHex;
+        }
+        if (gHex.length < 2) {
+          gHex = "0" + gHex;
+        }
+        if (bHex.length < 2) {
+          bHex = "0" + bHex;
+        }
 
-        const light1 = new THREE.AmbientLight( 0xffffff, 0.3 );
-        this.scene.add( light1 );
+        return '#' + rHex + gHex + bHex;
+    }  
+  
 
-        this.light2 = new THREE.DirectionalLight( 0xffffff, 0.8 * Math.PI );
-        this.light2.castShadow = true;
-        this.light2.shadow.camera.near = .1;
-        this.light2.shadow.camera.far = 20;
-        this.light2.shadow.bias = - 0.01;
-        this.light2.shadow.camera.right = 10;
-        this.light2.shadow.camera.left = - 10;
-        this.light2.shadow.camera.top	= 10;
-        this.light2.shadow.camera.bottom = - 10;
+    debugFolder()
+    {
+        /**
+         * @param {Debug} PARAMS
+        */
+        this.PARAMS = {
+            color: this.roomColor,
+        }
 
-        this.light2.shadow.mapSize.width = 2048;
-        this.light2.shadow.mapSize.height = 2048;
-        this.light2.position.set(2.7, 3, 0); // ~60°
+        // refer to the scene folder
+        this.debugFolder = this.debug.addFolder({
+            title: 'room',
+            expanded: true,
+        })
 
-        this.scene.add( this.light2 );
-
+        this.debugFolder
+            .addBinding(this.PARAMS, 'color')
+            .on('change', (ev) => {
+                this.room.traverse((o) => {
+                    if (o instanceof THREE.Mesh) {
+                        o.material.color.set(ev.value);
+                    }
+                })
+            });
     }
 
     createPoints()
@@ -141,14 +173,14 @@ export default class World
         console.log(this.cubeArray.length);
     }
 
-    createScene()
+    createRoom()
     {
         this.room = this.resources.items.scene.scene
 
         this.room.traverse((o) => {
             if (o.material?.name == 'base') {
                 o.material = new THREE.MeshPhysicalMaterial({
-                    color: 0xff8378,
+                    color: this.roomColor,
                     metalness: 0.2,
                     roughness: 1,
                     clearcoat: 0.6,
@@ -170,15 +202,29 @@ export default class World
         this.scene.add(this.room)
     }
 
+    createSky()
+    {
+
+        this.skyMaterial = new Sky({
+            // wirefrale: true,
+        })
+        this.geometry = new THREE.PlaneGeometry(2, 1.5, 20, 20)
+        this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
+
+        // this.sky.rotation.set(Math.PI * 1.5, 0, 0)
+        this.sky.position.set(0, .25, -2)
+        this.scene.add(this.sky)
+    }
+
 
     setup3D()
     {
         
-        this.material = new City({
-            // wireframe: true,
+        this.planeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x68dba7,
         })
         this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
-        this.plane = new THREE.Mesh(this.geometry, this.material)
+        this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
         this.plane.castShadow = true;
         this.plane.receiveShadow = true;
@@ -186,7 +232,7 @@ export default class World
         this.plane.position.set(0, -.5, -1)
         this.scene.add(this.plane)
 
-        this.flowers = new Flowers({})
+        // this.flowers = new Flowers({})
     }
 
     resize()
@@ -199,8 +245,8 @@ export default class World
         this.elapsedTime = window.performance.now() * 0.001;
         this.time = window.performance.now();
 
-        if (this.material) {
-            this.material.update(
+        if (this.skyMaterial) {
+            this.skyMaterial.update(
                 this.elapsedTime,
                 this.renderer.progress,
                 this.renderer.height,

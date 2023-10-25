@@ -16,15 +16,17 @@ export default class Renderer
         this.sizes = this.experience.sizes
         this.scene = this.experience.scene
         this.camera = this.experience.camera
-        this.light = this.experience.light
+        this.world = this.experience.world
 
         this.progress = 1;
         this.height = 0;
-        // this.seed = Math.random();
-        this.seed = 0.9580859306;
+        this.seed = Math.random();
+        // this.seed = 0.3861250778342058;
 
         // Alea setup
         this.prng = new Alea(this.seed);
+
+        console.log('seed', this.seed);
 
         // Debug
         if(this.debug)
@@ -85,7 +87,6 @@ export default class Renderer
             this.PARAMS = {
                 background: this.background,
                 seed: this.seed,
-                light: this.light,
                 progress: this.progress,
                 height: this.height,
             }
@@ -107,25 +108,6 @@ export default class Renderer
                     this.prng = new Alea(this.seed);
                 });
 
-            // this.debugFolder
-            //     .addBinding(
-            //         this.PARAMS,
-            //         'progress',
-            //         { min: 1., max: 10., step: 0.1 }
-            //     )
-            //     .on('change', (ev) => {
-            //         this.progress = ev.value
-            //     });
-
-            // this.debugFolder
-            //     .addBinding(
-            //         this.PARAMS,
-            //         'height',
-            //         { min: 0., max: 1., step: 0.01 }
-            //     )
-            //     .on('change', (ev) => {
-            //         this.height = ev.value
-            //     });
         }
     }
 
