@@ -4,6 +4,7 @@ import Experience from './Experience.js'
 
 import City from './Components/City.js'
 import Flowers from './Components/Flowers.js'
+import Tree from './Components/Tree.js'
 
 export default class World
 {
@@ -99,29 +100,8 @@ export default class World
         this.plane.position.set(0, 0, 0)
         this.scene.add(this.plane)
 
-
-        let cubeOffset = .45;
-        this.cubeArray = [];
-        for (var i = 0; i < this.vdata.cells.length; i++) {
-            this.cube = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    .1,
-                    this.renderer.prng(), // y,
-                    .1
-                ),
-                this.material
-            )
-
-            this.cube.position.set(
-                this.vdata.cells[i].site.x - cubeOffset,
-                0,
-                this.vdata.cells[i].site.z - cubeOffset
-            )
-            this.scene.add(this.cube)
-            this.cubeArray.push(this.cube);
-        }
-
         this.flowers = new Flowers({})
+        // this.trees = new Tree({})
     }
 
     resize()

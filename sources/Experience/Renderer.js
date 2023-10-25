@@ -20,7 +20,7 @@ export default class Renderer
         this.progress = 1;
         this.height = 0;
         // this.seed = Math.random();
-        this.seed = .8760063868;
+        this.seed = 0.3861250778342058;
 
         // Alea setup
         this.prng = new Alea(this.seed);
