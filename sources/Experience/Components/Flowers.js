@@ -61,7 +61,7 @@ export default class Flowers {
           o.castShadow = o.receiveShadow = true;
         }
       });
-    console.log(this.flower2);
+    // console.log(this.flower2);
 
     // this.flower3 = this.resources.items.flower3.scene;
     // this.flower3.traverse((o) => {

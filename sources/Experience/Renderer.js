@@ -20,6 +20,7 @@ export default class Renderer
 
         this.progress = 1;
         this.height = 0;
+        this.step = 0.3;
         this.seed = this.colorSettings.seed;
 
         // Alea setup
@@ -86,6 +87,7 @@ export default class Renderer
                 seed: this.seed,
                 progress: this.progress,
                 height: this.height,
+                step: this.step,
             }
 
             // DEBUG FOLDER
@@ -103,6 +105,16 @@ export default class Renderer
                 .on('change', (ev) => {
                     this.seed = ev.value
                     this.prng = new Alea(this.seed);
+                });
+
+            this.debugFolder
+                .addBinding(
+                    this.PARAMS,
+                    'step',
+                    {min: 0, max: 1, step: 0.01}
+                )
+                .on('change', (ev) => {
+                    this.step = ev.value
                 });
 
         }

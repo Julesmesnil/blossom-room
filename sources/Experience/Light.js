@@ -199,14 +199,10 @@ export default class Light
             this.modes.debug.instance.color.copy(currentColor);
 
 
-
             if (this.instance.shadow.map) {
                 this.lightShadowMapViewer.update();
                 this.lightShadowMapViewer.render( this.renderer.instance );
             }
-
-            // this.AmbientLight.intensity = currentIntensity
-
             
             // Update instance
             this.instance.copy(this.modes[this.mode].instance)

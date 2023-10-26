@@ -17,6 +17,7 @@ export default class World
         this.resources = this.experience.resources
         this.colorSettings = this.experience.colorSettings
         this.renderer = this.experience.renderer
+        this.light = this.experience.light
 
         
         this.pointAmount = 100; // debugeur
@@ -124,7 +125,7 @@ export default class World
         this.floor.scale.set(0.05, 0.05, 0.05)
 
         this.roof.traverse((o) => {
-            if (o.material?.name == 'base') {
+            if (o.material?.name == 'base1') {
                 o.material = new THREE.MeshStandardMaterial({
                     color: this.colorSettings.color1Hex,
                 })
@@ -283,13 +284,6 @@ export default class World
     //     const customMesh = new THREE.Mesh(boxGeometry, this.customMaterial);
     //     this.scene.add(customMesh);
     //     this.scene.add(this.sphere);
-    
-    //     // Update the sphere's position in the animation loop
-    //     // this.spherePosition = customMaterial.uniforms.spherePosition.value;
-    //     // this.sphereSpeed = 0.02; // Adjust as needed
-    //     // this.experience.on('update', () => {
-    //     //     spherePosition.x = Math.sin(this.time * sphereSpeed) * 2; // Example dynamic position
-    //     // });
     // }
     
 
@@ -308,7 +302,7 @@ export default class World
         this.plane.position.set(0, -.5, -1)
         this.scene.add(this.plane)
 
-        this.Flowers = new Flowers()
+        // this.Flowers = new Flowers()
     }
 
     resize()
@@ -326,6 +320,8 @@ export default class World
                 this.elapsedTime,
                 this.renderer.progress,
                 this.renderer.height,
+                this.renderer.step,
+                this.light.modes.debug.arcRotation
             );
         }
 
