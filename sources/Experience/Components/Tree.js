@@ -18,7 +18,7 @@ export default class Tree {
     this.mode = "debug";
 
     // tree counts
-    this.count = this.seedManager.prng() * 100;
+    this.count = this.seedManager.prng() * 500;
 
     this.ages = new Float32Array(this.count);
     this.scales = new Float32Array(this.count);

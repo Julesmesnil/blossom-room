@@ -18,8 +18,8 @@ export default class Flowers {
     this.mode = "debug";
 
     // flower counts
-    this.count = this.seedManager.prng() * 10000;
-    this.intersticeCount = this.seedManager.prng() * 10000;
+    this.count = this.seedManager.prng() * 30000;
+    this.intersticeCount = this.seedManager.prng() * 30000;
 
     // Face Flower lifecycle.
     this.ages = new Float32Array(this.count);
@@ -50,27 +50,6 @@ export default class Flowers {
     };
 
     // Flower gltf
-    this.flower = this.resources.items.flower.scene;
-    this.flower.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = o.receiveShadow = true;
-      }
-    });
-
-    this.flower2 = this.resources.items.flower2.scene;
-    this.flower2.traverse((o) => {
-        if (o.isMesh) {
-          o.castShadow = o.receiveShadow = true;
-        }
-      });
-
-    // this.flower3 = this.resources.items.flower3.scene;
-    // this.flower3.traverse((o) => {
-    //     if (o.isMesh) {
-    //       o.castShadow = o.receiveShadow = true;
-    //     }
-    //   });
-
     this.margarita = this.resources.items.margarita.scene;
     this.margarita.traverse((o) => {
       if (o.isMesh) {
@@ -145,7 +124,11 @@ export default class Flowers {
 
     // Assign random colors to the blossoms.
     this.color = new THREE.Color();
-    this.blossomPalette = ['0x' + this.colorSettings.baseHex.substring(1), '0x' + this.colorSettings.color1Hex.substring(1), '0x' + this.colorSettings.color2Hex.substring(1)];
+    this.blossomPalette = [
+      "0x" + this.colorSettings.baseHex.substring(1),
+      "0x" + this.colorSettings.color1Hex.substring(1),
+      "0x" + this.colorSettings.color2Hex.substring(1),
+    ];
 
     // Assign random colors to the face flowers blossoms.
     for (let i = 0; i < this.count; i++) {
