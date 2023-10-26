@@ -22,7 +22,8 @@ export default class ColorSettings
         // this.seed = 0.3861250778342058;
         // this.seed = 0.945517351;
         // this.seed = 0.974445839;
-        this.seed = 0.787155139;
+        // this.seed = 0.787155139;
+        // this.seed = 0.610628898;
         this.prng = new Alea(this.seed);
         console.log('seed', this.seed);
 

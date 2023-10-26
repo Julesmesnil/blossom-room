@@ -19,7 +19,7 @@ export default class World
         this.renderer = this.experience.renderer
 
         
-        this.pointAmount = 100; // debugeur
+        this.pointAmount = this.renderer.prng() * 100; // debugeur
         this.voronoi = new Voronoi();
         this.bbox = { xl: 0, xr: 2, yt: 2, yb: 0 };
         this.createPoints();
@@ -300,15 +300,17 @@ export default class World
             color: this.colorSettings.color2Hex,
         })
         this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
+        this.geometry.rotateX(-Math.PI * 0.5)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
         this.plane.castShadow = true;
         this.plane.receiveShadow = true;
-        this.plane.rotation.set(-Math.PI * 0.5, 0, 0)
+        // this.plane.rotation.set(-Math.PI * 0.5, 0, 0)
         this.plane.position.set(0, -.5, -1)
         this.scene.add(this.plane)
 
         this.Flowers = new Flowers()
+        this.Tree = new Tree()
     }
 
     resize()

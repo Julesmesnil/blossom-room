@@ -11,10 +11,9 @@ export default [
             { name: 'roof', source: '/assets/roof.glb', },
             { name: 'flower', source: '/assets/Flower.glb', },
             { name: 'flower2', source: '/assets/Flower2.glb', },
-            { name: 'flower3', source: '/assets/Flower3.glb', },
             { name: 'margarita', source: '/assets/margarita.glb', },
-            { name: 'tree', source: '/assets/tree.glb', },
-            { name: 'sapin', source: '/assets/sapin.glb', },
+            { name: 'sapin', source: '/assets/sapin2.glb', },
+            { name: 'calandula', source: '/assets/calandula.glb', },
             { name: 'scene', source: '/assets/scene.glb', },
         ]
     }

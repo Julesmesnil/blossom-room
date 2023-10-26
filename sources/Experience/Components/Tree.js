@@ -11,12 +11,13 @@ export default class Tree {
     this.resources = this.experience.resources;
     this.renderer = this.experience.renderer;
     this.world = this.experience.world;
+    this.colorSettings = this.experience.colorSettings;
 
     // Set up
     this.mode = "debug";
 
     // tree counts
-    this.count = 100;
+    this.count = this.renderer.prng() * 100;
 
     this.ages = new Float32Array(this.count);
     this.scales = new Float32Array(this.count);
@@ -34,19 +35,20 @@ export default class Tree {
       return Math.abs(this.easeOutCubic((t > 0.5 ? 1 - t : t) * 2));
     };
 
-    this.tree = this.resources.items.tree.scene;
-    this.tree.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = o.receiveShadow = true;
-      }
-    });
-
     this.sapin = this.resources.items.sapin.scene;
     this.sapin.traverse((o) => {
       if (o.isMesh) {
         o.castShadow = true;
       }
     });
+
+    this.calandula = this.resources.items.calandula.scene;
+    this.calandula.traverse((o) => {
+      if (o.isMesh) {
+        o.castShadow = true;
+      }
+    });
+    console.log(this.calandula);
 
     // Flower Meshes
     this._stemMesh = this.sapin.getObjectByName("Cylinder_Material001_0");
@@ -84,10 +86,15 @@ export default class Tree {
     // Assign random colors to the blossoms.
     this.color = new THREE.Color();
     this.blossomPalette = [
-      0xf20587, 0xf2d479, 0xf2c879, 0xf2b077, 0xf24405, 0xccff00, 0xffff00,
-      0xffcccc, 0xcc66ff, 0xcc0000, 0xff00ff, 0xff0033, 0x6600ff, 0x6699ff,
-      0x00ff33,
+      "0x" + this.colorSettings.baseHex.substring(1),
+      "0x" + this.colorSettings.color1Hex.substring(1),
+      "0x" + this.colorSettings.color2Hex.substring(1),
     ];
+    // this.blossomPalette = [
+    //   0xf20587, 0xf2d479, 0xf2c879, 0xf2b077, 0xf24405, 0xccff00, 0xffff00,
+    //   0xffcccc, 0xcc66ff, 0xcc0000, 0xff00ff, 0xff0033, 0x6600ff, 0x6699ff,
+    //   0x00ff33,
+    // ];
 
     // Assign random colors to the face flowers blossoms.
     for (let i = 0; i < this.count; i++) {
@@ -140,19 +147,43 @@ export default class Tree {
 
     plane.updateWorldMatrix(true);
     plane.matrixWorld.decompose(position, rotation, scale);
+
     // On utilise l'échantillonneur (sampler) pour extraire une position (_position) et une normale (_normal) d'un point de la surface du sol.
     this.sampler.sample(this._position, this._normal);
 
-    // this._position.multiply(scale);
     this._normal.add(this._position);
 
     // Copie de notre arbre
     this.dummy.position.copy(this._position).add(position);
-    this.dummy.scale.set(this.scales[i], this.scales[i], this.scales[i]);
-    this.dummy.lookAt(this._normal);
+
+    this.dummy.rotation.set(Math.PI * 0.5, 0, 0);
+    // this.dummy.scale.set(this.scales[i], this.scales[i], this.scales[i]);
+    // this.dummy.lookAt(this._normal);
+
     this.dummy.updateMatrix();
 
-    // On met à jour la matrice d'instance du maillage stemMesh et blossomMesh à l'indice i avec la matrice du dummy.
+    // let x = this.dummy.position.x;
+    // let z = this.dummy.position.z;
+    // let add = true;
+
+    // for (let i = 0; i < this.world.vdata.cells.length; i++) {
+    //   let p = this.world.vdata.cells[i].site;
+    //   let dx = p.x - x;
+    //   let dz = p.z - z;
+
+    //   // console.log('p.x : '+p.x, 'x : '+x, 'dx : '+dx, 'cal : '+ (dx * dx + dz * dz));
+    //   if (dx * dx + dz * dz < 0.3) {
+    //     console.log('delete')
+    //     add = false;
+    //     this.dummy.scale.set(0, 0, 0);
+    //     break;
+    //   }
+    // }
+    // // On met à jour la matrice d'instance du maillage stemMesh et blossomMesh à l'indice i avec la matrice du dummy.
+    // if(add){
+
+    // }
+
     this.stemMesh.setMatrixAt(i, this.dummy.matrix);
     this.blossomMesh.setMatrixAt(i, this.dummy.matrix);
   }
