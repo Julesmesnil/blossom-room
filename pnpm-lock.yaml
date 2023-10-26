@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@tweakpane/plugin-essentials': ^0.2.0
   '@types/three': ^0.157.2
   alea: ^1.0.1
   glsl-noise: ^0.0.0
@@ -16,6 +17,7 @@ specifiers:
   voronoi: ^1.0.0
 
 dependencies:
+  '@tweakpane/plugin-essentials': 0.2.0_tweakpane@4.0.1
   alea: 1.0.1
   glsl-noise: 0.0.0
   glsl-voronoi-noise: 1.2.2
@@ -245,6 +247,14 @@ packages:
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
+    dev: false
+
+  /@tweakpane/plugin-essentials/0.2.0_tweakpane@4.0.1:
+    resolution: {integrity: sha512-/kO90nfm0y0CYJPUvoNrjXhjNoqr+RaoySIdJmy++pb5vrSHi/DXdxG/sPszUPZggDY9M31RTacnxXi6Dv7r8Q==}
+    peerDependencies:
+      tweakpane: ^4.0.0-beta.2
+    dependencies:
+      tweakpane: 4.0.1
     dev: false
 
   /@types/stats.js/0.17.2:

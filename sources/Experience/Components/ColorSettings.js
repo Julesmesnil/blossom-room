@@ -1,4 +1,3 @@
-import {} from 'three'
 import Alea from 'alea'
 import Experience from '../Experience.js'
 
@@ -10,6 +9,7 @@ export default class ColorSettings
         this.experience = new Experience()
         this.config = this.experience.config
         this.debug = this.experience.debug
+        this.seedManager = this.experience.seedManager
         this.time = this.experience.time
         this.sizes = this.experience.sizes
         this.targetElement = this.experience.targetElement
@@ -18,13 +18,9 @@ export default class ColorSettings
         this.mode = 'debug' // defaultLight, debugLight
         this.colorMode = ['Analog', 'Monochromatic', 'Complementary', 'Triadic', 'Random']
         
-        this.seed = Math.random().toFixed(9);
-        // this.seed = 0.3861250778342058;
-        // this.seed = 0.945517351;
-        // this.seed = 0.974445839;
-        // this.seed = 0.787155139;
-        this.prng = new Alea(this.seed);
-        console.log('seed', this.seed);
+        this.seed = this.seedManager.seed
+        this.prng = this.seedManager.prng
+        // console.log('seed', this.seed);
 
 
         // Variables

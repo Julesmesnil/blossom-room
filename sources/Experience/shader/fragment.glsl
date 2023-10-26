@@ -23,7 +23,7 @@ void main() {
 
   vec3 col = getGradient(
               vec4(vec3(vColor1), 0.0),
-              vec4(vec3(vColor2), .33),
+              vec4(vec3(vColor2), .4),
 					    vUv.y
 				    );
 

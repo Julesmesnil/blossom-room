@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tweakpane/plugin-essentials": "^0.2.0",
     "alea": "^1.0.1",
     "glsl-noise": "^0.0.0",
     "glsl-voronoi-noise": "^1.2.2",

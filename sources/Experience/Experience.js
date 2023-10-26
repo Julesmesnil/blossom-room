@@ -1,10 +1,12 @@
 import * as THREE from 'three'
 import { Pane } from 'tweakpane';
+import * as EssentialsPlugin from '@tweakpane/plugin-essentials';
 
 import Time from './Utils/Time.js'
 import Sizes from './Utils/Sizes.js'
 import Stats from './Utils/Stats.js'
 
+import SeedManager from './Components/SeedManager.js';
 import ColorSettings from './Components/ColorSettings.js';
 import Resources from './Resources.js'
 import Renderer from './Renderer.js'
@@ -39,6 +41,7 @@ export default class Experience
         this.sizes = new Sizes()
         this.setConfig()
         this.setDebug()
+        this.seedManager()
         this.setStats()
         this.setScene()
         this.setCamera()
@@ -79,7 +82,14 @@ export default class Experience
             this.debug = new Pane({
                 width: 800
             });
+
+            this.debug.registerPlugin(EssentialsPlugin);
         }
+    }
+
+    seedManager()
+    {
+        this.seedManager = new SeedManager()
     }
 
     setStats()

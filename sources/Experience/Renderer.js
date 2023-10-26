@@ -10,6 +10,7 @@ export default class Renderer
         this.experience = new Experience()
         this.config = this.experience.config
         this.debug = this.experience.debug
+        this.seedManager = this.experience.seedManager
         this.stats = this.experience.stats
         this.time = this.experience.time
         this.sizes = this.experience.sizes
@@ -20,11 +21,11 @@ export default class Renderer
 
         this.progress = 1;
         this.height = 0;
-        this.step = 0.3;
-        this.seed = this.colorSettings.seed;
+        this.step = 0.4;
+        this.seed = this.seedManager.seed;
 
         // Alea setup
-        this.prng = this.colorSettings.prng;
+        this.prng = this.seedManager.prng;
 
         // Debug
         if(this.debug)
