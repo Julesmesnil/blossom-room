@@ -20,7 +20,6 @@ export default class SeedManager {
 			this.seed = seedFromUrl;
 		}
 		this.prng = new Alea(this.seed);
-		console.log('Current seed:', this.seed);
 	}
 
 	setInstance()

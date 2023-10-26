@@ -8,16 +8,18 @@ export default class Flowers {
     this.config = this.experience.config;
     this.scene = this.experience.scene;
     this.debug = this.experience.debug;
+    this.seedManager = this.experience.seedManager
     this.resources = this.experience.resources;
     this.renderer = this.experience.renderer;
     this.world = this.experience.world;
+    this.colorSettings = this.experience.colorSettings;
 
     // Set up
     this.mode = "debug";
 
     // flower counts
-    this.count = 10000;
-    this.intersticeCount = 10000;
+    this.count = this.seedManager.prng() * 10000;
+    this.intersticeCount = this.seedManager.prng() * 10000;
 
     // Face Flower lifecycle.
     this.ages = new Float32Array(this.count);
@@ -61,7 +63,6 @@ export default class Flowers {
           o.castShadow = o.receiveShadow = true;
         }
       });
-    // console.log(this.flower2);
 
     // this.flower3 = this.resources.items.flower3.scene;
     // this.flower3.traverse((o) => {
@@ -70,34 +71,43 @@ export default class Flowers {
     //     }
     //   });
 
-    // this.margarita = this.resources.items.margarita.scene;
-    // this.margarita.traverse((o) => {
-    //     if (o.isMesh) {
-    //       o.castShadow = o.receiveShadow = true;
-    //     }
-    //   });
-    // console.log(this.margarita);
+    this.margarita = this.resources.items.margarita.scene;
+    this.margarita.traverse((o) => {
+      if (o.isMesh) {
+        o.castShadow = o.receiveShadow = true;
+      }
+    });
 
     // Flower Meshes
-    this._stemMesh = this.flower.getObjectByName("Stem");
-    this._blossomMesh = this.flower.getObjectByName("Blossom");
+    this._stemMesh = this.margarita.getObjectByName(
+      "margarita_flower_yellow_0_2"
+    );
+    this._blossomMesh = this.margarita.getObjectByName(
+      "margarita_flower_yellow_0_1"
+    );
+    this._pollenMesh = this.margarita.getObjectByName(
+      "margarita_flower_yellow_0"
+    );
 
     // Flower Geometries
     this.stemGeometry = this._stemMesh.geometry.clone();
     this.blossomGeometry = this._blossomMesh.geometry.clone();
+    this.pollenGeometry = this._pollenMesh.geometry.clone();
 
     this.defaultTransform = new THREE.Matrix4()
       .makeRotationX(Math.PI)
-      .multiply(new THREE.Matrix4().makeScale(0.1, 0.1, 0.1));
+      .multiply(new THREE.Matrix4().makeScale(-0.02, -0.02, -0.005));
     // .multiply( new THREE.Matrix4().makeScale( .03, .03, .03 ) );
 
     // Apply default transform to geometries.
     this.stemGeometry.applyMatrix4(this.defaultTransform);
     this.blossomGeometry.applyMatrix4(this.defaultTransform);
+    this.pollenGeometry.applyMatrix4(this.defaultTransform);
 
     // Flower Materials
     this.stemMaterial = this._stemMesh.material;
     this.blossomMaterial = this._blossomMesh.material;
+    this.pollenMaterial = this._pollenMesh.material;
 
     // Face Flower Meshes
     this.stemMesh = new THREE.InstancedMesh(
@@ -110,32 +120,38 @@ export default class Flowers {
       this.blossomMaterial,
       this.count
     );
+    this.pollenMesh = new THREE.InstancedMesh(
+      this.pollenGeometry,
+      this.pollenMaterial,
+      this.count
+    );
 
     // Interstice Flower Meshes
     this.stemMeshInterstice = new THREE.InstancedMesh(
-        this.stemGeometry,
-        this.stemMaterial,
-        this.intersticeCount
-      );
-      this.blossomMeshInterstice = new THREE.InstancedMesh(
-        this.blossomGeometry,
-        this.blossomMaterial,
-        this.intersticeCount
-      );
+      this.stemGeometry,
+      this.stemMaterial,
+      this.intersticeCount
+    );
+    this.blossomMeshInterstice = new THREE.InstancedMesh(
+      this.blossomGeometry,
+      this.blossomMaterial,
+      this.intersticeCount
+    );
+    this.pollenMeshInterstice = new THREE.InstancedMesh(
+      this.pollenGeometry,
+      this.pollenMaterial,
+      this.intersticeCount
+    );
 
     // Assign random colors to the blossoms.
     this.color = new THREE.Color();
-    this.blossomPalette = [
-      0xf20587, 0xf2d479, 0xf2c879, 0xf2b077, 0xf24405, 0xccff00, 0xffff00,
-      0xffcccc, 0xcc66ff, 0xcc0000, 0xff00ff, 0xff0033, 0x6600ff, 0x6699ff,
-      0x00ff33,
-    ];
+    this.blossomPalette = ['0x' + this.colorSettings.baseHex.substring(1), '0x' + this.colorSettings.color1Hex.substring(1), '0x' + this.colorSettings.color2Hex.substring(1)];
 
     // Assign random colors to the face flowers blossoms.
     for (let i = 0; i < this.count; i++) {
       this.color.setHex(
         this.blossomPalette[
-          Math.floor(this.renderer.prng() * this.blossomPalette.length)
+          Math.floor(this.seedManager.prng() * this.blossomPalette.length)
         ]
       );
       this.blossomMesh.setColorAt(i, this.color);
@@ -143,29 +159,33 @@ export default class Flowers {
 
     // Assign random colors to the interstice flowers blossoms.
     for (let i = 0; i < this.intersticeCount; i++) {
-        this.color.setHex(
-          this.blossomPalette[
-            Math.floor(this.renderer.prng() * this.blossomPalette.length)
-          ]
-        );
-        this.blossomMeshInterstice.setColorAt(i, this.color);
-      }
+      this.color.setHex(
+        this.blossomPalette[
+          Math.floor(this.seedManager.prng() * this.blossomPalette.length)
+        ]
+      );
+      this.blossomMeshInterstice.setColorAt(i, this.color);
+    }
 
     // Instance matrices will be updated every frame.
     this.stemMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     this.blossomMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.pollenMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
     this.stemMeshInterstice.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     this.blossomMeshInterstice.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.pollenMeshInterstice.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
     this.resample();
     this.resampleInterstice();
 
     this.scene.add(this.stemMesh);
     this.scene.add(this.blossomMesh);
+    this.scene.add(this.pollenMesh);
 
     // this.scene.add(this.stemMeshInterstice);
     // this.scene.add(this.blossomMeshInterstice);
+    // this.scene.add(this.pollenMeshInterstice);
 
     // this.debugFolder();
 
@@ -189,19 +209,22 @@ export default class Flowers {
     });
 
     this.debugFolder
-    .addBinding(this.PARAMS, "count", { label: 'count', min: 10000, max: 100000, step: 1 })
-    .on("change", (ev) => {
+      .addBinding(this.PARAMS, "count", {
+        label: "count",
+        min: 10000,
+        max: 100000,
+        step: 1,
+      })
+      .on("change", (ev) => {
         this.count = ev.value;
-        this.stemMesh.count = this.count;
-        this.blossomMesh.count = this.count;
         this.resample();
-    });
+      });
   }
 
   resample() {
     let offset = 0;
     const count = Math.floor(this.count / this.world.cubeArray.length);
-    
+
     this.world.cubeArray.forEach((cube) => {
       // Création d'un échantilloneur de surface pour chaque cube
       const sampler = new MeshSurfaceSampler(cube.children[0].children[1])
@@ -213,7 +236,7 @@ export default class Flowers {
       for (let i = 0; i < count; i++) {
         // debug
         const index = i + offset;
-        this.ages[index] = this.renderer.prng();
+        this.ages[index] = this.seedManager.prng();
         this.scales[index] = this.scaleCurve(this.ages[index]);
 
         this.resampleParticle(index, cube.children[0].children[1]);
@@ -224,6 +247,7 @@ export default class Flowers {
 
     this.stemMesh.instanceMatrix.needsUpdate = true;
     this.blossomMesh.instanceMatrix.needsUpdate = true;
+    this.pollenMesh.instanceMatrix.needsUpdate = true;
   }
 
   resampleParticle(i, cube) {
@@ -248,12 +272,15 @@ export default class Flowers {
     // On met à jour la matrice d'instance du maillage stemMesh et blossomMesh à l'indice i avec la matrice du dummy.
     this.stemMesh.setMatrixAt(i, this.dummy.matrix);
     this.blossomMesh.setMatrixAt(i, this.dummy.matrix);
+    this.pollenMesh.setMatrixAt(i, this.dummy.matrix);
   }
 
   resampleInterstice() {
     let offset = 0;
-    const count = Math.floor(this.intersticeCount / this.world.cubeArray.length);
-    
+    const count = Math.floor(
+      this.intersticeCount / this.world.cubeArray.length
+    );
+
     this.world.cubeArray.forEach((cube) => {
       // Création d'un échantilloneur de surface pour chaque cube
       const sampler = new MeshSurfaceSampler(cube.children[0].children[0])
@@ -265,8 +292,10 @@ export default class Flowers {
       for (let i = 0; i < count; i++) {
         // debug
         const index = i + offset;
-        this.agesInterstice[index] = this.renderer.prng();
-        this.scalesInterstice[index] = this.scaleCurve(this.agesInterstice[index]);
+        this.agesInterstice[index] = this.seedManager.prng();
+        this.scalesInterstice[index] = this.scaleCurve(
+          this.agesInterstice[index]
+        );
 
         this.resampleParticleInterstice(index, cube.children[0].children[0]);
       }
@@ -276,6 +305,7 @@ export default class Flowers {
 
     this.stemMeshInterstice.instanceMatrix.needsUpdate = true;
     this.blossomMeshInterstice.instanceMatrix.needsUpdate = true;
+    this.pollenMeshInterstice.instanceMatrix.needsUpdate = true;
   }
 
   resampleParticleInterstice(i, cube) {
@@ -286,20 +316,28 @@ export default class Flowers {
     cube.updateWorldMatrix(true);
     cube.matrixWorld.decompose(position, rotation, scale);
     // On utilise l'échantillonneur (sampler) pour extraire une position (_position) et une normale (_normal) d'un point de la surface du cube.
-    cube.userData.sampler.sample(this._positionInterstice, this._normalInterstice);
+    cube.userData.sampler.sample(
+      this._positionInterstice,
+      this._normalInterstice
+    );
 
     this._positionInterstice.multiply(scale);
     this._normalInterstice.add(position);
 
     // Copie de notre fleur
     this.dummyInterstice.position.copy(this._positionInterstice).add(position);
-    this.dummyInterstice.scale.set(this.scalesInterstice[i], this.scalesInterstice[i], this.scalesInterstice[i]);
+    this.dummyInterstice.scale.set(
+      this.scalesInterstice[i],
+      this.scalesInterstice[i],
+      this.scalesInterstice[i]
+    );
     this.dummyInterstice.lookAt(this._normalInterstice);
     this.dummyInterstice.updateMatrix();
 
     // On met à jour la matrice d'instance du maillage stemMesh et blossomMesh à l'indice i avec la matrice du dummy.
     this.stemMeshInterstice.setMatrixAt(i, this.dummyInterstice.matrix);
     this.blossomMeshInterstice.setMatrixAt(i, this.dummyInterstice.matrix);
+    this.pollenMeshInterstice.setMatrixAt(i, this.dummyInterstice.matrix);
   }
 
   updateParticle(index, cube) {
@@ -327,6 +365,7 @@ export default class Flowers {
     this.dummy.matrix.scale(this._scale);
     this.stemMesh.setMatrixAt(index, this.dummy.matrix);
     this.blossomMesh.setMatrixAt(index, this.dummy.matrix);
+    this.pollenMesh.setMatrixAt(index, this.dummy.matrix);
   }
 
   updateParticleInterstice(index, cube) {
@@ -334,7 +373,9 @@ export default class Flowers {
     this.agesInterstice[index] += 0.005;
     if (this.agesInterstice[index] >= 1) {
       this.agesInterstice[index] = 0.001;
-      this.scalesInterstice[index] = this.scaleCurve(this.agesInterstice[index]);
+      this.scalesInterstice[index] = this.scaleCurve(
+        this.agesInterstice[index]
+      );
       this.resampleParticleInterstice(index, cube);
 
       return;
@@ -354,10 +395,11 @@ export default class Flowers {
     this.dummyInterstice.matrix.scale(this._scaleInterstice);
     this.stemMeshInterstice.setMatrixAt(index, this.dummyInterstice.matrix);
     this.blossomMeshInterstice.setMatrixAt(index, this.dummyInterstice.matrix);
+    this.pollenMeshInterstice.setMatrixAt(index, this.dummyInterstice.matrix);
   }
 
   animate() {
-    if (this.stemMesh && this.blossomMesh) {
+    if (this.stemMesh && this.blossomMesh && this.pollenMesh) {
       let offset = 0;
       const count = Math.floor(this.count / this.world.cubeArray.length);
 
@@ -371,29 +413,39 @@ export default class Flowers {
 
       this.stemMesh.instanceMatrix.needsUpdate = true;
       this.blossomMesh.instanceMatrix.needsUpdate = true;
+      this.pollenMesh.instanceMatrix.needsUpdate = true;
 
       this.stemMesh.geometry.computeBoundingSphere();
       this.blossomMesh.geometry.computeBoundingSphere();
+      this.pollenMesh.geometry.computeBoundingSphere();
     }
 
-    if (this.stemMeshInterstice && this.blossomMeshInterstice) {
-        let offsetInterstice = 0;
-        const countInterstice = Math.floor(this.intersticeCount / this.world.cubeArray.length);
-  
-        this.world.cubeArray.forEach((cube) => {
-          for (let i = 0; i < countInterstice; i++) {
-            const index = i + offsetInterstice;
-            this.updateParticleInterstice(index, cube.children[0].children[0]);
-          }
-          offsetInterstice += countInterstice;
-        });
-  
-        this.stemMeshInterstice.instanceMatrix.needsUpdate = true;
-        this.blossomMeshInterstice.instanceMatrix.needsUpdate = true;
-  
-        this.stemMeshInterstice.geometry.computeBoundingSphere();
-        this.blossomMeshInterstice.geometry.computeBoundingSphere();
-      }
+    if (
+      this.stemMeshInterstice &&
+      this.blossomMeshInterstice &&
+      this.pollenMeshInterstice
+    ) {
+      let offsetInterstice = 0;
+      const countInterstice = Math.floor(
+        this.intersticeCount / this.world.cubeArray.length
+      );
+
+      this.world.cubeArray.forEach((cube) => {
+        for (let i = 0; i < countInterstice; i++) {
+          const index = i + offsetInterstice;
+          this.updateParticleInterstice(index, cube.children[0].children[0]);
+        }
+        offsetInterstice += countInterstice;
+      });
+
+      this.stemMeshInterstice.instanceMatrix.needsUpdate = true;
+      this.blossomMeshInterstice.instanceMatrix.needsUpdate = true;
+      this.pollenMeshInterstice.instanceMatrix.needsUpdate = true;
+
+      this.stemMeshInterstice.geometry.computeBoundingSphere();
+      this.blossomMeshInterstice.geometry.computeBoundingSphere();
+      this.pollenMeshInterstice.geometry.computeBoundingSphere();
+    }
   }
 
   update() {

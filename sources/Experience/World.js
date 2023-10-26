@@ -13,6 +13,7 @@ export default class World
         this.experience = new Experience()
         this.config = this.experience.config
         this.debug = this.experience.debug
+        this.seedManager = this.experience.seedManager
         this.scene = this.experience.scene
         this.resources = this.experience.resources
         this.colorSettings = this.experience.colorSettings
@@ -20,7 +21,7 @@ export default class World
         this.light = this.experience.light
 
         
-        this.pointAmount = 100; // debugeur
+        this.pointAmount = this.seedManager.prng() * 100; // debugeur
         this.voronoi = new Voronoi();
         this.bbox = { xl: 0, xr: 2, yt: 2, yb: 0 };
         this.createPoints();
@@ -75,8 +76,8 @@ export default class World
 
         this.vpoints = [];
         for (let i = 0; i < this.pointAmount; i++) {
-            let x = (this.renderer.prng() * 2) - .5; // debugeur
-            let z = (this.renderer.prng() * 1.5) - .25; // debugeur
+            let x = (this.seedManager.prng() * 2) - .5; // debugeur
+            let z = (this.seedManager.prng() * 1.5) - .25; // debugeur
             let add = true;
 
             for (let j = 0; j < this.vpoints.length; j++) {
@@ -149,8 +150,11 @@ export default class World
         let cubeOffset = .50 - .05; // debugeur
         this.cubeArray = [];
         for (var i = 0; i < this.vdata.cells.length; i++) {
-            let zValue = this.renderer.prng();
+            let zValue = this.seedManager.prng();
             let numCubes = Math.abs(Math.floor(zValue * 10));
+
+            let cubeOffsetY = -.5
+            let cubeOffsetZ = -.4
 
         
             for (let j = 0; j < numCubes; j++) {
@@ -160,8 +164,8 @@ export default class World
                     let roof = this.roof.clone();
                     roof.position.set(
                         this.vdata.cells[i].site.x - cubeOffset,
-                        -.5 + (cubeHeight * j + .05),
-                        -1 + (this.vdata.cells[i].site.z - cubeOffset)
+                        cubeOffsetY + (cubeHeight * j + .05),
+                        cubeOffsetZ + (this.vdata.cells[i].site.z - cubeOffset)
                         );
                     this.scene.add(roof);
                     this.cubeArray.push(roof);
@@ -170,8 +174,8 @@ export default class World
         
                     cube.position.set(
                         this.vdata.cells[i].site.x - cubeOffset,
-                        -.5 + (cubeHeight * j + .05),
-                        -1 + (this.vdata.cells[i].site.z - cubeOffset)
+                        cubeOffsetY + (cubeHeight * j + .05),
+                        cubeOffsetZ + (this.vdata.cells[i].site.z - cubeOffset)
                     );
 
                     this.scene.add(cube);
@@ -179,7 +183,6 @@ export default class World
                 }
             }
         }
-        console.log(this.cubeArray.length);
     }
 
     createRoom()
@@ -217,11 +220,10 @@ export default class World
         this.skyMaterial = new Sky({
             // wirefrale: true,
         })
-        this.geometry = new THREE.PlaneGeometry(2, 1.5, 20, 20)
+        this.geometry = new THREE.PlaneGeometry(3, 1.5, 20, 20)
         this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
 
-        // this.sky.rotation.set(Math.PI * 1.5, 0, 0)
-        this.sky.position.set(0, .25, -2)
+        this.sky.position.set(0, .25, -1.4)
         this.scene.add(this.sky)
     }
 
@@ -294,15 +296,17 @@ export default class World
             color: this.colorSettings.color2Hex,
         })
         this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
+        this.geometry.rotateX(-Math.PI * 0.5)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
         this.plane.castShadow = true;
         this.plane.receiveShadow = true;
-        this.plane.rotation.set(-Math.PI * 0.5, 0, 0)
-        this.plane.position.set(0, -.5, -1)
+        // this.plane.rotation.set(-Math.PI * 0.5, 0, 0)
+        this.plane.position.set(0, -.5, -.4)
         this.scene.add(this.plane)
 
-        // this.Flowers = new Flowers()
+        this.Flowers = new Flowers()
+        this.Tree = new Tree()
     }
 
     resize()

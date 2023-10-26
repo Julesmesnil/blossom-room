@@ -20,7 +20,6 @@ export default class ColorSettings
         
         this.seed = this.seedManager.seed
         this.prng = this.seedManager.prng
-        // console.log('seed', this.seed);
 
 
         // Variables
