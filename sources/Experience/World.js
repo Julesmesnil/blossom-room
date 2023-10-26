@@ -14,6 +14,7 @@ export default class World
         this.debug = this.experience.debug
         this.scene = this.experience.scene
         this.resources = this.experience.resources
+        this.colorSettings = this.experience.colorSettings
         this.renderer = this.experience.renderer
 
         
@@ -21,9 +22,6 @@ export default class World
         this.voronoi = new Voronoi();
         this.bbox = { xl: 0, xr: 2, yt: 2, yb: 0 };
         this.createPoints();
-
-        // room default color
-        this.roomColor = this.floatToRandomHexColor()
 
         // Set up
         this.mode = 'debug'
@@ -36,33 +34,12 @@ export default class World
                 this.createFloors()
                 this.createRoom()
                 this.createSky()
+                this.createMorph()
                 this.debugFolder() // Debug
                 this.setup3D()
             }
         })
     }
-
-    floatToRandomHexColor() {
-        let r = Math.floor(this.renderer.prng() * 256);
-        let g = Math.floor(this.renderer.prng() * 256);
-        let b = Math.floor(this.renderer.prng() * 256);
-      
-        let rHex = r.toString(16);
-        let gHex = g.toString(16);
-        let bHex = b.toString(16);
-      
-        if (rHex.length < 2) {
-          rHex = "0" + rHex;
-        }
-        if (gHex.length < 2) {
-          gHex = "0" + gHex;
-        }
-        if (bHex.length < 2) {
-          bHex = "0" + bHex;
-        }
-
-        return '#' + rHex + gHex + bHex;
-    }  
   
 
     debugFolder()
@@ -71,7 +48,7 @@ export default class World
          * @param {Debug} PARAMS
         */
         this.PARAMS = {
-            color: this.roomColor,
+            color: this.colorSettings.baseHex,
         }
 
         // refer to the scene folder
@@ -122,11 +99,12 @@ export default class World
     {
         // this.scene.background = this.resources.items.env;
         this.floor = this.resources.items.floor.scene
+        this.roof = this.resources.items.roof.scene
 
         this.floor.traverse((o) => {
             if (o.material?.name == 'base') {
                 o.material = new THREE.MeshStandardMaterial({
-                    color: 0x68dba7,
+                    color: this.colorSettings.color1Hex,
                 })
                 o.material.roughness = 0.9;
                 o.material.metalness = 0.3;
@@ -144,6 +122,28 @@ export default class World
         })
         this.floor.scale.set(0.05, 0.05, 0.05)
 
+        this.roof.traverse((o) => {
+            if (o.material?.name == 'base') {
+                o.material = new THREE.MeshStandardMaterial({
+                    color: this.colorSettings.color1Hex,
+                })
+                o.material.roughness = 0.9;
+                o.material.metalness = 0.3;
+            }
+            if (o.material?.name == 'glass') {
+                o.material = new THREE.MeshStandardMaterial()
+                // add an environment map to the material
+                o.material.envMap = this.resources.items.env;
+                o.material.envMapIntensity = 1;
+                o.material.roughness = 0.1;
+                o.material.metalness = 0.8;
+            }
+            o.castShadow = true;
+            o.receiveShadow = true;
+        })
+        this.roof.scale.set(0.05, 0.05, 0.05)
+
+
         let cubeOffset = .50 - .05; // debugeur
         this.cubeArray = [];
         for (var i = 0; i < this.vdata.cells.length; i++) {
@@ -153,21 +153,28 @@ export default class World
         
             for (let j = 0; j < numCubes; j++) {
                 let cubeHeight = .1
-        
-                let cube = this.floor.clone();
-        
-                cube.position.set(
-                    this.vdata.cells[i].site.x - cubeOffset,
-                    -.5 + (cubeHeight * j + .05),
-                    -1 + (this.vdata.cells[i].site.z - cubeOffset)
-                );
 
-                if (numCubes >1 && j === numCubes - 1) {
-                    cube.material = new THREE.MeshStandardMaterial({ color: 0x3A59FF }); // Dernier cube en bleu
-                }
+                if (numCubes > 1 && j === numCubes - 1) {
+                    let roof = this.roof.clone();
+                    roof.position.set(
+                        this.vdata.cells[i].site.x - cubeOffset,
+                        -.5 + (cubeHeight * j + .05),
+                        -1 + (this.vdata.cells[i].site.z - cubeOffset)
+                        );
+                    this.scene.add(roof);
+                    this.cubeArray.push(roof);
+                } else {
+                    let cube = this.floor.clone();
         
-                this.scene.add(cube);
-                this.cubeArray.push(cube);
+                    cube.position.set(
+                        this.vdata.cells[i].site.x - cubeOffset,
+                        -.5 + (cubeHeight * j + .05),
+                        -1 + (this.vdata.cells[i].site.z - cubeOffset)
+                    );
+
+                    this.scene.add(cube);
+                    this.cubeArray.push(cube);
+                }
             }
         }
         console.log(this.cubeArray.length);
@@ -180,7 +187,7 @@ export default class World
         this.room.traverse((o) => {
             if (o.material?.name == 'base') {
                 o.material = new THREE.MeshPhysicalMaterial({
-                    color: this.roomColor,
+                    color: this.colorSettings.baseHex,
                     metalness: 0.2,
                     roughness: 1,
                     clearcoat: 0.6,
@@ -191,12 +198,12 @@ export default class World
             o.castShadow = true;
             o.receiveShadow = true;
         })
-        this.room.scale.set(0.5, 0.5, 0.5)
+        this.room.scale.set(.8, 0.5, 0.5)
         this.room.rotation.set(0, Math.PI * 1.5, 0)
         this.room.position.set(
             0,
             0,
-            1
+            1.5
         )
 
         this.scene.add(this.room)
@@ -216,12 +223,80 @@ export default class World
         this.scene.add(this.sky)
     }
 
+    // createMorph() {
+    //     const boxGeometry = new THREE.BoxGeometry(.5, .5, .2);
+    //     const sphereGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+    //     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    //     this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    
+    //     this.customMaterial = new THREE.ShaderMaterial({
+    //         uniforms: {
+    //             uTime: { value: 0.0 },
+    //             spherePosition: { value: new THREE.Vector3(0, 0, 0) }, // Initial position
+    //         },
+    //         vertexShader: `
+    //             varying vec2 vUv;
+    //             void main() {
+    //                 vUv = uv;
+    //                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    //             }
+    //         `,
+    //         fragmentShader: `
+    //             uniform float uTime;
+    //             uniform vec3 spherePosition;
+    //             varying vec2 vUv;
+    
+    //             // Box SDF (Signed Distance Function)
+    //             float box(vec3 p, vec3 size) {
+    //                 vec3 d = abs(p) - size;
+    //                 return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+    //             }
+    
+    //             void main() {
+    //                 vec3 rayOrigin = cameraPosition;
+    //                 vec3 rayDirection = normalize(vec3(vUv.xy - 0.5, 1.0));
+    
+    //                 float t = 0.0;
+    //                 float maxDistance = 10.0;
+    //                 vec3 p;
+    
+    //                 for (int i = 0; i < 100; i++) {
+    //                     p = rayOrigin + t * rayDirection;
+                        
+    //                     // Update the box SDF in real-time
+    //                     float boxSDF = box(p - spherePosition, vec3(1.0, 1.0, 1.0));
+    
+    //                     if (boxSDF < 0.001 || t > maxDistance) {
+    //                         gl_FragColor = vec4(.5, .7, 0.0, 1.0);
+    //                         return;
+    //                     }
+    
+    //                     t += boxSDF;
+    //                 }
+    
+    //                 gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    //             }
+    //         `,
+    //     });
+    
+    //     const customMesh = new THREE.Mesh(boxGeometry, this.customMaterial);
+    //     this.scene.add(customMesh);
+    //     this.scene.add(this.sphere);
+    
+    //     // Update the sphere's position in the animation loop
+    //     // this.spherePosition = customMaterial.uniforms.spherePosition.value;
+    //     // this.sphereSpeed = 0.02; // Adjust as needed
+    //     // this.experience.on('update', () => {
+    //     //     spherePosition.x = Math.sin(this.time * sphereSpeed) * 2; // Example dynamic position
+    //     // });
+    // }
+    
+
 
     setup3D()
     {
-        
         this.planeMaterial = new THREE.MeshStandardMaterial({
-            color: 0x68dba7,
+            color: this.colorSettings.color2Hex,
         })
         this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
@@ -251,6 +326,14 @@ export default class World
                 this.renderer.progress,
                 this.renderer.height,
             );
+        }
+
+        if(this.customMaterial)
+        {
+            this.sphereSpeed = 0.5; // Adjust as needed
+            this.customMaterial.uniforms.uTime.value = this.elapsedTime;
+            this.customMaterial.uniforms.spherePosition.value.x = this.sphere.position.x
+            // this.sphere.position.x = Math.sin(this.elapsedTime * this.sphereSpeed); // Example dynamic position
         }
     }
 

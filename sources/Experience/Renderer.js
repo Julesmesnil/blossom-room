@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import Alea from 'alea'
 import Experience from './Experience.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -15,18 +14,16 @@ export default class Renderer
         this.time = this.experience.time
         this.sizes = this.experience.sizes
         this.scene = this.experience.scene
+        this.colorSettings = this.experience.colorSettings
         this.camera = this.experience.camera
         this.world = this.experience.world
 
         this.progress = 1;
         this.height = 0;
-        this.seed = Math.random();
-        // this.seed = 0.3861250778342058;
+        this.seed = this.colorSettings.seed;
 
         // Alea setup
-        this.prng = new Alea(this.seed);
-
-        console.log('seed', this.seed);
+        this.prng = this.colorSettings.prng;
 
         // Debug
         if(this.debug)

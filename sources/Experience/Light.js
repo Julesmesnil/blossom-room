@@ -38,8 +38,8 @@ export default class Light
         this.instance.shadow.camera.right = 3
         this.instance.shadow.camera.top = 1.5
         this.instance.shadow.camera.bottom = -2
-        this.instance.shadow.mapSize.width = 2048 // put high res button : 4096
-        this.instance.shadow.mapSize.height = 2048 // put high res button : 4096
+        this.instance.shadow.mapSize.width = 1024 // put high res button : 4096
+        this.instance.shadow.mapSize.height = 1024 // put high res button : 4096
         this.instance.shadow.normalBias = 0.0001
         this.instance.intensity = 2
         this.scene.add(this.instance)
@@ -128,29 +128,29 @@ export default class Light
             { label: 'color' }
         )
 
-        this.debugFolder.addBinding(
-            this.PARAMS,
-            'x',
-            { label: 'x', min: -5, max: 5, step: 0.001 }
-        )
+        // this.debugFolder.addBinding(
+        //     this.PARAMS,
+        //     'x',
+        //     { label: 'x', min: -5, max: 5, step: 0.001 }
+        // )
 
-        this.debugFolder.addBinding(
-            this.PARAMS,
-            'y',
-            { label: 'y', min: -5, max: 5, step: 0.001 }
-        )
+        // this.debugFolder.addBinding(
+        //     this.PARAMS,
+        //     'y',
+        //     { label: 'y', min: -5, max: 5, step: 0.001 }
+        // )
 
-        this.debugFolder.addBinding(
-            this.PARAMS,
-            'z',
-            { label: 'z', min: -5, max: 5, step: 0.001 }
-        )
+        // this.debugFolder.addBinding(
+        //     this.PARAMS,
+        //     'z',
+        //     { label: 'z', min: -5, max: 5, step: 0.001 }
+        // )
 
-        this.debugFolder.addBinding(
-            this.PARAMS,
-            'ambientIntensity',
-            { label: 'ambientIntensity', min: 0, max: 1, step: 0.001 }
-        )
+        // this.debugFolder.addBinding(
+        //     this.PARAMS,
+        //     'ambientIntensity',
+        //     { label: 'ambientIntensity', min: 0, max: 1, step: 0.001 }
+        // )
 
         this.debugFolder.addBinding(
             this.PARAMS,

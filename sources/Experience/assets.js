@@ -9,6 +9,7 @@ export default [
             { name: 'env2', source: '/assets/env/env.exr', type: 'exr' },
             { name: 'floor', source: '/assets/floor.glb', },
             { name: 'scene', source: '/assets/scene.glb', },
+            { name: 'roof', source: '/assets/roof.glb', },
         ]
     }
 ]

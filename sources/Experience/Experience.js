@@ -5,6 +5,7 @@ import Time from './Utils/Time.js'
 import Sizes from './Utils/Sizes.js'
 import Stats from './Utils/Stats.js'
 
+import ColorSettings from './Components/ColorSettings.js';
 import Resources from './Resources.js'
 import Renderer from './Renderer.js'
 import Camera from './Camera.js'
@@ -41,6 +42,7 @@ export default class Experience
         this.setStats()
         this.setScene()
         this.setCamera()
+        this.setColorSettings()
         this.setRenderer()
         this.setLight()
         this.setResources()
@@ -98,6 +100,15 @@ export default class Experience
         this.camera = new Camera()
     }
 
+    setColorSettings()
+    {
+        this.colorSettings = new ColorSettings()
+        if(this.config.debug)
+        {
+            this.colorSettings.debugFolder()
+        }
+    }
+
     setLight()
     {
         this.light = new Light()
@@ -130,6 +141,9 @@ export default class Experience
             this.stats.update()
         
         this.camera.update()
+
+        if(this.colorSettings)
+            this.colorSettings.update()
 
         if(this.world)
             this.world.update()
