@@ -23,7 +23,6 @@ export default class World
         this.voronoi = new Voronoi();
         this.bbox = { xl: 0, xr: 2, yt: 2, yb: 0 };
         this.createPoints();
-        this.addLights();
 
         // Set up
         this.mode = 'debug'
@@ -36,7 +35,7 @@ export default class World
                 this.createFloors()
                 this.createRoom()
                 this.createSky()
-                this.createMorph()
+                // this.createMorph()
                 this.debugFolder() // Debug
                 this.setup3D()
             }
@@ -309,29 +308,7 @@ export default class World
         this.plane.position.set(0, -.5, -1)
         this.scene.add(this.plane)
 
-
-        let cubeOffset = .45;
-        this.cubeArray = [];
-        for (var i = 0; i < this.vdata.cells.length; i++) {
-            this.cube = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    .1,
-                    this.renderer.prng(), // y,
-                    .1
-                ),
-                this.material
-            )
-
-            this.cube.position.set(
-                this.vdata.cells[i].site.x - cubeOffset,
-                0,
-                this.vdata.cells[i].site.z - cubeOffset
-            )
-            this.scene.add(this.cube)
-            this.cubeArray.push(this.cube);
-        }
-
-        console.log(this.vdata.cells.length);
+        this.Flowers = new Flowers()
     }
 
     resize()
