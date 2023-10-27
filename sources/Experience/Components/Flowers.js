@@ -8,7 +8,7 @@ export default class Flowers {
     this.config = this.experience.config;
     this.scene = this.experience.scene;
     this.debug = this.experience.debug;
-    this.seedManager = this.experience.seedManager
+    this.seedManager = this.experience.seedManager;
     this.resources = this.experience.resources;
     this.renderer = this.experience.renderer;
     this.world = this.experience.world;
@@ -18,8 +18,8 @@ export default class Flowers {
     this.mode = "debug";
 
     // flower counts
-    this.count = this.seedManager.prng() * 30000;
-    this.intersticeCount = this.seedManager.prng() * 30000;
+    this.count = this.seedManager.prng() * 10000;
+    this.intersticeCount = this.seedManager.prng() * 10000;
 
     // Face Flower lifecycle.
     this.ages = new Float32Array(this.count);
@@ -75,7 +75,7 @@ export default class Flowers {
 
     this.defaultTransform = new THREE.Matrix4()
       .makeRotationX(Math.PI)
-      .multiply(new THREE.Matrix4().makeScale(-0.02, -0.02, -0.005));
+      .multiply(new THREE.Matrix4().makeScale(-0.04, -0.04, -0.005));
     // .multiply( new THREE.Matrix4().makeScale( .03, .03, .03 ) );
 
     // Apply default transform to geometries.
@@ -213,6 +213,9 @@ export default class Flowers {
       const sampler = new MeshSurfaceSampler(cube.children[0].children[1])
         .setWeightAttribute("uv")
         .build();
+
+      // reset the MeshSurfaceSampler random function to the seedManager prng
+      sampler.randomFunction = this.seedManager.prng;
 
       cube.children[0].children[1].userData.sampler = sampler;
 

@@ -13,6 +13,7 @@ import Renderer from './Renderer.js'
 import Camera from './Camera.js'
 import Light from './Light.js'
 import World from './World.js'
+import Sound from './Components/Sound.js';
 
 import assets from './assets.js'
 
@@ -49,6 +50,7 @@ export default class Experience
         this.setRenderer()
         this.setLight()
         this.setResources()
+        this.setSound()
         this.setWorld()
         
         this.sizes.on('resize', () =>
@@ -138,6 +140,11 @@ export default class Experience
     setResources()
     {
         this.resources = new Resources(assets)
+    }
+
+    setSound()
+    {
+        this.sound = new Sound()
     }
 
     setWorld()

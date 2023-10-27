@@ -26,9 +26,14 @@ export default class Renderer {
     this.seed = this.seedManager.seed;
 
     this.threshold = 0;
-    this.strength = 1;
+    this.strength = .3;
     this.radius = 0.5;
     this.exposure = 1;
+
+    this.BLOOM_SCENE = 1;
+
+	this.bloomLayer = new THREE.Layers();
+	this.bloomLayer.set( this.BLOOM_SCENE );
 
     // Alea setup
     this.prng = this.seedManager.prng;
@@ -164,11 +169,7 @@ export default class Renderer {
     /**
      * Bloom Composer
      */
-    this.postProcess.bloomComposer = new EffectComposer(
-      this.instance,
-      this.renderTarget
-    );
-    this.postProcess.composer.renderToScreen = false;
+    this.postProcess.composer.renderToScreen = true;
     this.postProcess.composer.addPass(this.postProcess.renderPass);
     this.postProcess.composer.addPass(this.postProcess.bloomPass);
 
@@ -180,7 +181,7 @@ export default class Renderer {
         uniforms: {
           baseTexture: { value: null },
           bloomTexture: {
-            value: this.postProcess.bloomComposer.renderTarget2.texture,
+            value: this.postProcess.composer.renderTarget2.texture,
           },
         },
         vertexShader: `
@@ -214,6 +215,47 @@ export default class Renderer {
     this.postProcess.finalComposer.addPass(this.postProcess.renderPass);
     this.postProcess.finalComposer.addPass(this.postProcess.mixPass);
     // this.postProcess.finalComposer.addPass(this.postProcess.outputPass);
+
+    function disposeMaterial( obj ) {
+        if ( obj.material ) {
+
+            obj.material.dispose();
+
+        }
+    }
+
+    function darkenNonBloomed( obj ) {
+
+        if ( obj.isMesh && bloomLayer.test( obj.layers ) === false ) {
+
+            materials[ obj.uuid ] = obj.material;
+            obj.material = darkMaterial;
+
+        }
+
+    }
+
+    function restoreMaterial( obj ) {
+
+        if ( materials[ obj.uuid ] ) {
+
+            obj.material = materials[ obj.uuid ];
+            delete materials[ obj.uuid ];
+
+        }
+
+    }
+
+    function bloomRender() {
+
+        // this.scene.traverse( darkenNonBloomed );
+        this.bloomComposer.render();
+        // this.scene.traverse( restoreMaterial );
+
+        // render the entire scene, then render bloom scene on top
+        //this.finalComposer.render();
+
+    }
   }
 
   resize() {
@@ -231,11 +273,11 @@ export default class Renderer {
       this.stats.beforeRender();
     }
 
-    if (this.usePostprocess) {
-      this.postProcess.composer.render();
-    } else {
+    // if (this.usePostprocess) {
+    //   this.postProcess.composer.render();
+    // } else {
       this.instance.render(this.scene, this.camera.instance);
-    }
+    // }
 
     if (this.stats) {
       this.stats.afterRender();

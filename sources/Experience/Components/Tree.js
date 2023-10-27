@@ -126,6 +126,9 @@ export default class Tree {
       .setWeightAttribute("uv")
       .build();
 
+    // reset the MeshSurfaceSampler random function to the seedManager prng
+    this.sampler.randomFunction = this.seedManager.prng;
+
     //   cube.children[0].children[1].userData.sampler = sampler;
 
     for (let i = 0; i < this.count; i++) {
