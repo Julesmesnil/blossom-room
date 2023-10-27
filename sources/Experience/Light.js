@@ -199,11 +199,18 @@ export default class Light
             currentColor.lerpColors(dayColor, this.nightColor, Math.abs(0.5 - this.modes.debug.arcRotation) * 2);
             this.modes.debug.instance.color.copy(currentColor);
 
-
             if (this.instance.shadow.map) {
                 this.lightShadowMapViewer.update();
                 this.lightShadowMapViewer.render( this.renderer.instance );
             }
+
+            // Use Bloom postprocess or not
+            // if (this.PARAMS.arcRotation > 0.9 || this.PARAMS.arcRotation < .1) {
+            //     this.renderer.usePostprocess = true;
+            // } else {
+            //     this.renderer.usePostprocess = false;
+            // }
+
             
             // Update instance
             this.instance.copy(this.modes[this.mode].instance)

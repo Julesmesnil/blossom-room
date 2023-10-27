@@ -50,8 +50,14 @@ export default class Camera
         this.modes.debug.orbitControls.enabled = this.modes.debug.active
         this.modes.debug.orbitControls.screenSpacePanning = true
         this.modes.debug.orbitControls.enableKeys = false
-        this.modes.debug.orbitControls.zoomSpeed = 0.25
+        this.modes.debug.orbitControls.enableZoom = false
+        this.modes.debug.orbitControls.minPolarAngle = Math.PI / 2.1
+        this.modes.debug.orbitControls.maxPolarAngle = Math.PI / 1.9
+        this.modes.debug.orbitControls.minAzimuthAngle = - Math.PI / 35
+        this.modes.debug.orbitControls.maxAzimuthAngle = Math.PI / 35
+        this.modes.debug.orbitControls.rotateSpeed = 0.1
         this.modes.debug.orbitControls.enableDamping = true
+        this.modes.debug.orbitControls.dampingFactor = 0.025
         this.modes.debug.orbitControls.update()
     }
 

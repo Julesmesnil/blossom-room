@@ -30,11 +30,11 @@ export default class Renderer
         // Debug
         if(this.debug)
         {
-            this.debugFolder = this.debug.addFolder({
-                title: 'scene',
-                // expanded: true,
-                expanded: false,
-            })
+            // this.debugFolder = this.debug.addFolder({
+            //     title: 'scene',
+            //     // expanded: true,
+            //     expanded: false,
+            // })
         }
         
         this.usePostprocess = false
@@ -146,38 +146,24 @@ export default class Renderer
             this.PARAMS = {
                 background: this.background,
                 seed: this.seed,
-                progress: this.progress,
-                height: this.height,
-                step: this.step,
             }
 
             // DEBUG FOLDER
-            this.debugFolder
-                .addBinding(this.PARAMS, 'background')
-                .on('change', (ev) => {
-                    this.instance.setClearColor(ev.value)
-                });
+            // this.debugFolder
+            //     .addBinding(this.PARAMS, 'background')
+            //     .on('change', (ev) => {
+            //         this.instance.setClearColor(ev.value)
+            //     });
 
-            this.debugFolder
-                .addBinding(
-                    this.PARAMS,
-                    'seed',
-                )
-                .on('change', (ev) => {
-                    this.seed = ev.value
-                    this.prng = new Alea(this.seed);
-                });
-
-            this.debugFolder
-                .addBinding(
-                    this.PARAMS,
-                    'step',
-                    {min: 0, max: 1, step: 0.01}
-                )
-                .on('change', (ev) => {
-                    this.step = ev.value
-                });
-
+            // this.debugFolder
+            //     .addBinding(
+            //         this.PARAMS,
+            //         'seed',
+            //     )
+            //     .on('change', (ev) => {
+            //         this.seed = ev.value
+            //         this.prng = new Alea(this.seed);
+            //     });
         }
     }
 

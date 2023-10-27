@@ -18,7 +18,7 @@ export default class Tree {
     this.mode = "debug";
 
     // tree counts
-    this.count = this.seedManager.prng() * 100;
+    this.count = this.seedManager.prng() * 500;
 
     this.ages = new Float32Array(this.count);
     this.scales = new Float32Array(this.count);
@@ -125,6 +125,9 @@ export default class Tree {
     this.sampler = new MeshSurfaceSampler(this.world.plane)
       .setWeightAttribute("uv")
       .build();
+
+    // reset the MeshSurfaceSampler random function to the seedManager prng
+    this.sampler.randomFunction = this.seedManager.prng;
 
     //   cube.children[0].children[1].userData.sampler = sampler;
 

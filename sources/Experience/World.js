@@ -46,7 +46,7 @@ export default class World
                 this.createRoom()
                 this.createSky()
                 // this.createMorph()
-                this.debugFolder() // Debug
+                // this.debugFolder() // Debug
                 this.setup3D()
             }
         })
@@ -125,8 +125,8 @@ export default class World
 
         this.vpoints = [];
         for (let i = 0; i < this.pointAmount; i++) {
+            let z = (this.seedManager.prng() * 3) - 1.75; // debugeur
             let x = (this.seedManager.prng() * 2) - .5; // debugeur
-            let z = (this.seedManager.prng() * 1.5) - .25; // debugeur
             let add = true;
 
             for (let j = 0; j < this.vpoints.length; j++) {
@@ -272,10 +272,13 @@ export default class World
         this.skyMaterial = new Sky({
             // wirefrale: true,
         })
-        this.geometry = new THREE.PlaneGeometry(3, 1.5, 20, 20)
+        this.geometry = new THREE.PlaneGeometry(2, 1.5, 20, 20)
         this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
 
-        this.sky.position.set(0, .25, -1.4)
+        this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
+        this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
+
+        this.sky.position.set(0, .50, -3.6)
         this.scene.add(this.sky)
     }
 
@@ -354,21 +357,19 @@ export default class World
         this.scene.add(customMesh);
     }
     
-
-
     setup3D()
     {
         this.planeMaterial = new THREE.MeshStandardMaterial({
             color: this.colorSettings.color2Hex,
         })
-        this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
+        this.geometry = new THREE.PlaneGeometry(3, 4, 20, 20)
         this.geometry.rotateX(-Math.PI * 0.5)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
         this.plane.castShadow = true;
         this.plane.receiveShadow = true;
         // this.plane.rotation.set(-Math.PI * 0.5, 0, 0)
-        this.plane.position.set(0, -.5, -.4)
+        this.plane.position.set(0, -.5, -1.6)
         this.scene.add(this.plane)
 
         this.Flowers = new Flowers()

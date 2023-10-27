@@ -8,7 +8,7 @@ export default class Flowers {
     this.config = this.experience.config;
     this.scene = this.experience.scene;
     this.debug = this.experience.debug;
-    this.seedManager = this.experience.seedManager
+    this.seedManager = this.experience.seedManager;
     this.resources = this.experience.resources;
     this.renderer = this.experience.renderer;
     this.world = this.experience.world;
@@ -50,27 +50,6 @@ export default class Flowers {
     };
 
     // Flower gltf
-    this.flower = this.resources.items.flower.scene;
-    this.flower.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = o.receiveShadow = true;
-      }
-    });
-
-    this.flower2 = this.resources.items.flower2.scene;
-    this.flower2.traverse((o) => {
-        if (o.isMesh) {
-          o.castShadow = o.receiveShadow = true;
-        }
-      });
-
-    // this.flower3 = this.resources.items.flower3.scene;
-    // this.flower3.traverse((o) => {
-    //     if (o.isMesh) {
-    //       o.castShadow = o.receiveShadow = true;
-    //     }
-    //   });
-
     this.margarita = this.resources.items.margarita.scene;
     this.margarita.traverse((o) => {
       if (o.isMesh) {
@@ -96,7 +75,7 @@ export default class Flowers {
 
     this.defaultTransform = new THREE.Matrix4()
       .makeRotationX(Math.PI)
-      .multiply(new THREE.Matrix4().makeScale(-0.02, -0.02, -0.005));
+      .multiply(new THREE.Matrix4().makeScale(-0.04, -0.04, -0.005));
     // .multiply( new THREE.Matrix4().makeScale( .03, .03, .03 ) );
 
     // Apply default transform to geometries.
@@ -145,7 +124,11 @@ export default class Flowers {
 
     // Assign random colors to the blossoms.
     this.color = new THREE.Color();
-    this.blossomPalette = ['0x' + this.colorSettings.baseHex.substring(1), '0x' + this.colorSettings.color1Hex.substring(1), '0x' + this.colorSettings.color2Hex.substring(1)];
+    this.blossomPalette = [
+      "0x" + this.colorSettings.baseHex.substring(1),
+      "0x" + this.colorSettings.color1Hex.substring(1),
+      "0x" + this.colorSettings.color2Hex.substring(1),
+    ];
 
     // Assign random colors to the face flowers blossoms.
     for (let i = 0; i < this.count; i++) {
@@ -231,6 +214,9 @@ export default class Flowers {
       const sampler = new MeshSurfaceSampler(cube.children[0].children[1])
         .setWeightAttribute("uv")
         .build();
+
+      // reset the MeshSurfaceSampler random function to the seedManager prng
+      sampler.randomFunction = this.seedManager.prng;
 
       cube.children[0].children[1].userData.sampler = sampler;
 
