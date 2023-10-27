@@ -41,8 +41,16 @@ export default class Sound {
         label: 'Sound',   // optional
       });
 
+      let isPlaying = false;
+
       btn.on('click', () => {
-        this.ambient.play();
+        if (isPlaying) {
+          this.ambient.pause();
+          isPlaying = false;
+        } else {
+          this.ambient.play();
+          isPlaying = true;
+        }
       });
   }
 
