@@ -32,14 +32,74 @@ export default class Renderer
         {
             this.debugFolder = this.debug.addFolder({
                 title: 'scene',
-                expanded: true,
+                // expanded: true,
+                expanded: false,
             })
         }
         
         this.usePostprocess = false
 
         this.setInstance()
-        this.setPostProcess()
+        // this.setPostProcess()
+        this.makeTextureScene()
+    }
+
+    makeTextureScene()
+    {
+        this.textureScene = new THREE.Scene();
+
+        this.PlaneGeometry = new THREE.PlaneGeometry(2, 2);
+        this.customPlaneMaterial = new THREE.ShaderMaterial({
+            vertexShader: `
+                varying vec2 vUv;
+
+                void main() {
+                    vUv = uv;
+                    gl_Position = vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                varying vec2 vUv;
+    
+                void main() {
+
+                    vec2    center = vec2(0.5);
+                    float   distToCenter = length(vUv - center);
+                    float  circle = step(.2, distToCenter);
+                    
+                    // discard the black part of the texture
+                    float a = 1.;
+
+                    if(circle == 0.0){
+                        a = 0.;
+                    }
+
+                    gl_FragColor = vec4(a);
+                }
+            `,
+        })
+
+        this.planeTextureMesh = new THREE.Mesh(this.PlaneGeometry, this.customPlaneMaterial);
+
+        this.textureScene.add(this.planeTextureMesh);
+
+
+        this.textureSceneTarget = new THREE.WebGLRenderTarget(
+            this.config.width,
+            this.config.height,
+            {
+            format: THREE.RGBAFormat,
+            // magFilter: THREE.NearestFilter,
+            // minFilter: THREE.NearestFilter,
+            // generateMipmaps: false,
+            // depthBuffer: false,
+            // stencilBuffer: false,
+            // type: THREE.FloatType,
+            // depthTexture: false,
+            // depthTextureType: THREE.FloatType,
+            })
+
+        // this.instance.render(this.textureScene, this.camera.instance);
     }
 
     setInstance()
@@ -50,7 +110,7 @@ export default class Renderer
         // Renderer
         this.instance = new THREE.WebGLRenderer({
             // alpha: false,
-            antialias: true
+            antialias: true,
         })
         this.instance.domElement.style.position = 'absolute'
         this.instance.domElement.style.top = 0
@@ -63,9 +123,9 @@ export default class Renderer
         this.instance.setPixelRatio(this.config.pixelRatio)
 
         this.instance.physicallyCorrectLights = false
-        // this.instance.outputColorSpace = THREE.SRGBColorSpace
+        this.instance.outputColorSpace = THREE.SRGBColorSpace
         this.instance.toneMapping = THREE.ACESFilmicToneMapping
-        this.instance.toneMappingExposure = .8
+        this.instance.toneMappingExposure = 1
         
         this.instance.shadowMap.enabled = true
         this.instance.shadowMap.type = THREE.PCFSoftShadowMap
@@ -176,6 +236,9 @@ export default class Renderer
         }
         else
         {
+            this.instance.setRenderTarget(this.textureSceneTarget)
+            this.instance.render(this.textureScene, this.camera.instance)
+            this.instance.setRenderTarget(null)
             this.instance.render(this.scene, this.camera.instance)
         }
 

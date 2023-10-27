@@ -108,12 +108,13 @@ export default class Light
             z: this.modes.debug.instance.position.z,
             ambientIntensity: this.AmbientLight.intensity,
             arcRotation: this.modes.debug.arcRotation,
-            ShadowMapViewer: false,
+            ShadowMapViewer: true,
         }
 
         this.debugFolder = this.debug.addFolder({
             title: 'light',
-            expanded: true,
+            // expanded: true,
+            expanded: false,
         })
 
         this.debugFolder.addBinding(

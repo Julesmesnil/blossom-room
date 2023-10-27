@@ -205,7 +205,8 @@ export default class Flowers {
     // refer to the scene folder
     this.debugFolder = this.debug.addFolder({
       title: "flowers",
-      expanded: true,
+      // expanded: true,
+      expanded: false,
     });
 
     this.debugFolder

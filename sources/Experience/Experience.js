@@ -96,7 +96,7 @@ export default class Experience
     {
         if(this.config.debug)
         {
-            this.stats = new Stats(true)
+            this.stats = new Stats(false)
         }
     }
     

@@ -15,6 +15,7 @@ export default class World
         this.debug = this.experience.debug
         this.seedManager = this.experience.seedManager
         this.scene = this.experience.scene
+        this.camera = this.experience.camera
         this.resources = this.experience.resources
         this.colorSettings = this.experience.colorSettings
         this.renderer = this.experience.renderer
@@ -28,6 +29,13 @@ export default class World
 
         // Set up
         this.mode = 'debug'
+
+        this.isSphere = true;
+        this.sphereRadius = 0.2; // Radius of the circle
+        this.spherePosition = new THREE.Vector2(0.5, 0.5); // Initial position
+        this.isBox = false;
+        this.boxSize = new THREE.Vector3(0.1, 0.1, 0.1); // Initial position
+        this.boxPosition = new THREE.Vector2(0.5, 0.5); // Initial position
 
         this.resources.on('groupEnd', (_group) =>
         {
@@ -43,7 +51,6 @@ export default class World
             }
         })
     }
-  
 
     debugFolder()
     {
@@ -52,12 +59,18 @@ export default class World
         */
         this.PARAMS = {
             color: this.colorSettings.baseHex,
+            isSphere: this.isSphere,
+            sphereRadius: this.sphereRadius,
+            spherePosition: this.spherePosition,
+            isBox: this.isBox,
+            boxSize: this.boxSize,
+            boxPosition: this.boxPosition,
         }
 
         // refer to the scene folder
         this.debugFolder = this.debug.addFolder({
             title: 'room',
-            expanded: true,
+            expanded: false,
         })
 
         this.debugFolder
@@ -69,6 +82,42 @@ export default class World
                     }
                 })
             });
+
+            console.log(this.customDepthMaterial)
+            
+        // SPHERE
+        this.debugFolder.addBinding(this.PARAMS,'isSphere',{ label: 'isSphere' })
+            .on('change', (ev) => {
+                this.customMaterial.uniforms.uIsSphere.value = ev.value;
+                this.customDepthMaterial.uniforms.uIsSphere.value = ev.value;
+            });
+        this.debugFolder.addBinding(this.PARAMS, 'sphereRadius',{ min: 0, max: 1, step: 0.01 })
+            .on('change', (ev) => {
+                this.customMaterial.uniforms.uSphereRadius.value = ev.value;
+                this.customDepthMaterial.uniforms.uSphereRadius.value = ev.value;
+            });
+        this.debugFolder.addBinding(this.PARAMS, 'spherePosition',{ min: 0, max: 1, step: 0.01 })
+            .on('change', (ev) => {
+                this.customMaterial.uniforms.uSpherePosition.value = ev.value;
+                this.customDepthMaterial.uniforms.uSpherePosition.value = ev.value;
+            });
+        this.debugFolder.addBinding(this.PARAMS, 'isBox',{ label: 'isBox' })
+            .on('change', (ev) => {
+                this.customMaterial.uniforms.uIsBox.value = ev.value;
+                this.customDepthMaterial.uniforms.uIsBox.value = ev.value;
+            });
+        this.debugFolder.addBinding(this.PARAMS, 'boxSize',{ min: 0, max: 1, step: 0.01 })
+            .on('change', (ev) => {
+                this.customMaterial.uniforms.uBoxSize.value = ev.value;
+                this.customDepthMaterial.uniforms.uBoxSize.value = ev.value;
+            });
+        this.debugFolder.addBinding(this.PARAMS, 'boxPosition',{ min: 0, max: 1, step: 0.01 })
+            .on('change', (ev) => {
+                this.customMaterial.uniforms.uBoxPosition.value = ev.value;
+                this.customDepthMaterial.uniforms.uBoxPosition.value = ev.value;
+            });
+        
+
     }
 
     createPoints()
@@ -188,6 +237,7 @@ export default class World
     createRoom()
     {
         this.room = this.resources.items.scene.scene
+        // this.room = this.resources.items.scene2.scene
 
         this.room.traverse((o) => {
             if (o.material?.name == 'base') {
@@ -211,6 +261,8 @@ export default class World
             1.5
         )
 
+        this.room.renderOrder = -1;
+
         this.scene.add(this.room)
     }
 
@@ -227,66 +279,80 @@ export default class World
         this.scene.add(this.sky)
     }
 
-    // createMorph() {
-    //     const boxGeometry = new THREE.BoxGeometry(.5, .5, .2);
-    //     const sphereGeometry = new THREE.SphereGeometry(0.2, 32, 32);
-    //     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    //     this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    createMorph() {
+
+        this.customDepthMaterial = new THREE.MeshDepthMaterial({
+            depthPacking: THREE.RGBADepthPacking,
+            map: this.renderer.textureSceneTarget.texture,
+            alphaTest: 0.5,
+        });
     
-    //     this.customMaterial = new THREE.ShaderMaterial({
-    //         uniforms: {
-    //             uTime: { value: 0.0 },
-    //             spherePosition: { value: new THREE.Vector3(0, 0, 0) }, // Initial position
-    //         },
-    //         vertexShader: `
-    //             varying vec2 vUv;
-    //             void main() {
-    //                 vUv = uv;
-    //                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    //             }
-    //         `,
-    //         fragmentShader: `
-    //             uniform float uTime;
-    //             uniform vec3 spherePosition;
-    //             varying vec2 vUv;
+        const boxGeometry = new THREE.BoxGeometry(1.5, 1.5, .1);
+        this.customMaterial = new THREE.ShaderMaterial({
+            transparent: true,
+            uniforms: {
+                uTime: { value: 0.0 },
+                uIsSphere: { value: this.isSphere },
+                uSphereRadius: { value: this.sphereRadius }, // Radius of the circle
+                uSpherePosition: { value: this.spherePosition }, // Initial position
+                uIsBox: { value: this.isBox },
+                uBoxSize: { value: this.boxSize }, // Initial position
+                uBoxPosition: { value: this.boxPosition }, // Initial position
+                uTexture: { value: this.renderer.textureSceneTarget.texture }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float uTime;
+                uniform bool uIsSphere;
+                uniform float uSphereRadius;
+                uniform vec2 uSpherePosition;
+                uniform bool uIsBox;
+                uniform vec3 uBoxSize;
+                uniform vec2 uBoxPosition;
+                uniform sampler2D uTexture;
+
+                varying vec2 vUv;
     
-    //             // Box SDF (Signed Distance Function)
-    //             float box(vec3 p, vec3 size) {
-    //                 vec3 d = abs(p) - size;
-    //                 return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
-    //             }
-    
-    //             void main() {
-    //                 vec3 rayOrigin = cameraPosition;
-    //                 vec3 rayDirection = normalize(vec3(vUv.xy - 0.5, 1.0));
-    
-    //                 float t = 0.0;
-    //                 float maxDistance = 10.0;
-    //                 vec3 p;
-    
-    //                 for (int i = 0; i < 100; i++) {
-    //                     p = rayOrigin + t * rayDirection;
-                        
-    //                     // Update the box SDF in real-time
-    //                     float boxSDF = box(p - spherePosition, vec3(1.0, 1.0, 1.0));
-    
-    //                     if (boxSDF < 0.001 || t > maxDistance) {
-    //                         gl_FragColor = vec4(.5, .7, 0.0, 1.0);
-    //                         return;
-    //                     }
-    
-    //                     t += boxSDF;
-    //                 }
-    
-    //                 gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-    //             }
-    //         `,
-    //     });
-    
-    //     const customMesh = new THREE.Mesh(boxGeometry, this.customMaterial);
-    //     this.scene.add(customMesh);
-    //     this.scene.add(this.sphere);
-    // }
+                void main() {
+
+                    // vec2    center = uSpherePosition;
+                    // float   distToCenter = length(vUv - center);
+                    // float  circle = step(uSphereRadius, distToCenter);
+                    
+                    // // vec3    boxPosition = vec3(uBoxPosition, .5);
+                    // // vec3    boxSize = vec3(.2, .2, .2);
+                    // // float   box = step(uBoxPosition.x, vUv.x) + step(uBoxPosition.y, vUv.y) + step(.1, 0.);
+                    
+                    // // discard the black part of the texture
+                    // if(circle == 0.0 && uIsSphere) discard;
+
+
+                    // gl_FragColor = vec4(0.4, 0.8, 0.2, 1.0);
+                    gl_FragColor = texture2D(uTexture, vUv);
+
+                }
+            `,
+        });
+        
+        const customMesh = new THREE.Mesh(boxGeometry, this.customMaterial);
+        customMesh.position.set(0, 0, .75);
+        customMesh.castShadow = true;
+        customMesh.receiveShadow = true;
+        
+        customMesh.customDepthMaterial = this.customDepthMaterial;
+        // this.customMaterial.uniforms.shadowMap = { value: shadowMap.texture };
+        // this.customMaterial.uniforms.uShadowBias = { value: 0.005 };
+
+        // this.renderer.instance.render(customMesh, this.camera.instance, shadowMap);
+
+        this.scene.add(customMesh);
+    }
     
 
 
@@ -331,11 +397,9 @@ export default class World
 
         if(this.customMaterial)
         {
-            this.sphereSpeed = 0.5; // Adjust as needed
-            this.customMaterial.uniforms.uTime.value = this.elapsedTime;
-            this.customMaterial.uniforms.spherePosition.value.x = this.sphere.position.x
-            // this.sphere.position.x = Math.sin(this.elapsedTime * this.sphereSpeed); // Example dynamic position
+            this.customMaterial.uniforms.uTexture.value = this.renderer.textureSceneTarget.texture;
         }
+
     }
 
     destroy()
