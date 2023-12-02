@@ -21,7 +21,7 @@ export default class Light
         this.arcRotation = this.renderer.prng()
 
         this.setInstance()
-        this.setModes()
+        // this.setModes()
         this.setTimeAnimation()
     }
 
@@ -48,8 +48,8 @@ export default class Light
         this.scene.add(this.AmbientLight)
 
         // helper
-        this.directionnalLightHelper = new DirectionalLightHelper(this.instance, 0.1)
-        this.scene.add(this.directionnalLightHelper)
+        // this.directionnalLightHelper = new DirectionalLightHelper(this.instance, 0.1)
+        // this.scene.add(this.directionnalLightHelper)
 
         const lightShadowMapViewer = new ShadowMapViewer( this.instance );
         lightShadowMapViewer.position.x = 10;
@@ -170,52 +170,70 @@ export default class Light
 
     update()
     {
-        // Update debug
-        if(this.debugFolder)
-        {
-            this.modes.debug.instance.intensity = this.PARAMS.intensity
-            this.modes.debug.instance.color = this.PARAMS.color
-            this.modes.debug.instance.position.x = this.PARAMS.x
-            this.modes.debug.instance.position.y = this.PARAMS.y
-            this.modes.debug.instance.position.z = this.PARAMS.z
-            this.AmbientLight.intensity = this.PARAMS.ambientIntensity
-            this.modes.debug.arcRotation = this.PARAMS.arcRotation;
 
-            // Ambient Light intensity
-            const currentIntensity = this.maxIntensity + (this.minIntensity - this.maxIntensity) * Math.abs(0.5 - this.modes.debug.arcRotation) * 2;
-            this.AmbientLight.intensity = currentIntensity;
+        // Ambient Light intensity
+        // const currentIntensity = this.maxIntensity + (this.minIntensity - this.maxIntensity) * Math.abs(0.5 - this.arcRotation) * 2;
+        // this.AmbientLight.intensity = currentIntensity;
 
-            // Directional Light position
-            const radius = 5;
-            const centerX = 0;
-            const centerZ = 0;
-            const x = centerX + radius * Math.cos(Math.PI * this.modes.debug.arcRotation);
-            const y = centerZ + radius * Math.sin(Math.PI * this.modes.debug.arcRotation);
-            this.modes.debug.instance.position.set(x, y, -3);
+        // const radius = 5;
+        // const centerX = 0;
+        // const centerZ = 0;
+        // const x = centerX + radius * Math.cos(Math.PI * this.arcRotation);
+        // const y = centerZ + radius * Math.sin(Math.PI * this.arcRotation);
+        // this.instance.position.set(x, y, -3);
 
-            // Directional Light color
-            const dayColor = this.currentColor;
-            const currentColor = new Color();
-            currentColor.lerpColors(dayColor, this.nightColor, Math.abs(0.5 - this.modes.debug.arcRotation) * 2);
-            this.modes.debug.instance.color.copy(currentColor);
+        // const dayColor = this.currentColor;
+        // const currentColor = new Color();
+        // currentColor.lerpColors(dayColor, this.nightColor, Math.abs(0.5 - this.arcRotation) * 2);
+        // this.instance.color.copy(currentColor);
 
-            if (this.instance.shadow.map) {
-                this.lightShadowMapViewer.update();
-                this.lightShadowMapViewer.render( this.renderer.instance );
-            }
 
-            // Use Bloom postprocess or not
-            // if (this.PARAMS.arcRotation > 0.9 || this.PARAMS.arcRotation < .1) {
-            //     this.renderer.usePostprocess = true;
-            // } else {
-            //     this.renderer.usePostprocess = false;
-            // }
+        // // Update debug
+        // if(this.debugFolder)
+        // {
+        //     this.modes.debug.instance.intensity = this.PARAMS.intensity
+        //     this.modes.debug.instance.color = this.PARAMS.color
+        //     this.modes.debug.instance.position.x = this.PARAMS.x
+        //     this.modes.debug.instance.position.y = this.PARAMS.y
+        //     this.modes.debug.instance.position.z = this.PARAMS.z
+        //     this.AmbientLight.intensity = this.PARAMS.ambientIntensity
+        //     this.modes.debug.arcRotation = this.PARAMS.arcRotation;
+
+        //     // Ambient Light intensity
+        //     const currentIntensity = this.maxIntensity + (this.minIntensity - this.maxIntensity) * Math.abs(0.5 - this.modes.debug.arcRotation) * 2;
+        //     this.AmbientLight.intensity = currentIntensity;
+
+        //     // Directional Light position
+        //     const radius = 5;
+        //     const centerX = 0;
+        //     const centerZ = 0;
+        //     const x = centerX + radius * Math.cos(Math.PI * this.modes.debug.arcRotation);
+        //     const y = centerZ + radius * Math.sin(Math.PI * this.modes.debug.arcRotation);
+        //     this.modes.debug.instance.position.set(x, y, -3);
+
+        //     // Directional Light color
+        //     const dayColor = this.currentColor;
+        //     const currentColor = new Color();
+        //     currentColor.lerpColors(dayColor, this.nightColor, Math.abs(0.5 - this.modes.debug.arcRotation) * 2);
+        //     this.modes.debug.instance.color.copy(currentColor);
+
+        //     if (this.instance.shadow.map) {
+        //         this.lightShadowMapViewer.update();
+        //         this.lightShadowMapViewer.render( this.renderer.instance );
+        //     }
+
+        //     // Use Bloom postprocess or not
+        //     // if (this.PARAMS.arcRotation > 0.9 || this.PARAMS.arcRotation < .1) {
+        //     //     this.renderer.usePostprocess = true;
+        //     // } else {
+        //     //     this.renderer.usePostprocess = false;
+        //     // }
 
             
-            // Update instance
-            this.instance.copy(this.modes[this.mode].instance)
-            this.instance.lookAt(1, 0, 0)
-        }
+        //     // Update instance
+        //     this.instance.copy(this.modes[this.mode].instance)
+        //     this.instance.lookAt(1, 0, 0)
+        // }
     }
 
     destroy()

@@ -41,66 +41,66 @@ export default class Renderer
 
         this.setInstance()
         // this.setPostProcess()
-        this.makeTextureScene()
+        // this.makeTextureScene()
     }
 
-    makeTextureScene()
-    {
-        this.textureScene = new THREE.Scene();
+    // makeTextureScene()
+    // {
+    //     this.textureScene = new THREE.Scene();
 
-        this.PlaneGeometry = new THREE.PlaneGeometry(2, 2);
-        this.customPlaneMaterial = new THREE.ShaderMaterial({
-            vertexShader: `
-                varying vec2 vUv;
+    //     this.PlaneGeometry = new THREE.PlaneGeometry(2, 2);
+    //     this.customPlaneMaterial = new THREE.ShaderMaterial({
+    //         vertexShader: `
+    //             varying vec2 vUv;
 
-                void main() {
-                    vUv = uv;
-                    gl_Position = vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                varying vec2 vUv;
+    //             void main() {
+    //                 vUv = uv;
+    //                 gl_Position = vec4(position, 1.0);
+    //             }
+    //         `,
+    //         fragmentShader: `
+    //             varying vec2 vUv;
     
-                void main() {
+    //             void main() {
 
-                    vec2    center = vec2(0.5);
-                    float   distToCenter = length(vUv - center);
-                    float  circle = step(.2, distToCenter);
+    //                 vec2    center = vec2(0.5);
+    //                 float   distToCenter = length(vUv - center);
+    //                 float  circle = step(.2, distToCenter);
                     
-                    // discard the black part of the texture
-                    float a = 1.;
+    //                 // discard the black part of the texture
+    //                 float a = 1.;
 
-                    if(circle == 0.0){
-                        a = 0.;
-                    }
+    //                 if(circle == 0.0){
+    //                     a = 0.;
+    //                 }
 
-                    gl_FragColor = vec4(a);
-                }
-            `,
-        })
+    //                 gl_FragColor = vec4(a);
+    //             }
+    //         `,
+    //     })
 
-        this.planeTextureMesh = new THREE.Mesh(this.PlaneGeometry, this.customPlaneMaterial);
+    //     this.planeTextureMesh = new THREE.Mesh(this.PlaneGeometry, this.customPlaneMaterial);
 
-        this.textureScene.add(this.planeTextureMesh);
+    //     this.textureScene.add(this.planeTextureMesh);
 
 
-        this.textureSceneTarget = new THREE.WebGLRenderTarget(
-            this.config.width,
-            this.config.height,
-            {
-            format: THREE.RGBAFormat,
-            // magFilter: THREE.NearestFilter,
-            // minFilter: THREE.NearestFilter,
-            // generateMipmaps: false,
-            // depthBuffer: false,
-            // stencilBuffer: false,
-            // type: THREE.FloatType,
-            // depthTexture: false,
-            // depthTextureType: THREE.FloatType,
-            })
+    //     this.textureSceneTarget = new THREE.WebGLRenderTarget(
+    //         this.config.width,
+    //         this.config.height,
+    //         {
+    //         format: THREE.RGBAFormat,
+    //         // magFilter: THREE.NearestFilter,
+    //         // minFilter: THREE.NearestFilter,
+    //         // generateMipmaps: false,
+    //         // depthBuffer: false,
+    //         // stencilBuffer: false,
+    //         // type: THREE.FloatType,
+    //         // depthTexture: false,
+    //         // depthTextureType: THREE.FloatType,
+    //         })
 
-        // this.instance.render(this.textureScene, this.camera.instance);
-    }
+    //     // this.instance.render(this.textureScene, this.camera.instance);
+    // }
 
     setInstance()
     {
@@ -222,10 +222,10 @@ export default class Renderer
         }
         else
         {
-            this.instance.setRenderTarget(this.textureSceneTarget)
-            this.instance.render(this.textureScene, this.camera.instance)
-            this.instance.setRenderTarget(null)
-            this.instance.render(this.scene, this.camera.instance)
+            // this.instance.setRenderTarget(this.textureSceneTarget);
+            // this.instance.render(this.textureScene, this.camera.instance);
+            // this.instance.setRenderTarget(null);
+            this.instance.render(this.scene, this.camera.instance);
         }
 
         if(this.stats)

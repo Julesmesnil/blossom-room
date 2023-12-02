@@ -24,7 +24,7 @@ export default class Sound {
     this.ambient.loop = true;
     this.ambient.volume = 0.3;
 
-    this.debugFolder();
+    // this.debugFolder();
   }
 
   resize() {}

@@ -47,9 +47,48 @@ export default class World
                 this.createSky()
                 // this.createMorph()
                 // this.debugFolder() // Debug
+                // this.makeBlurScene()
                 this.setup3D()
             }
         })
+    }
+
+    makeBlurScene()
+    {
+        this.blurGeometry = new THREE.PlaneGeometry(1, 1);
+        this.blurMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                tDiffuse: { value: null }, // This will be the input texture
+                resolution: { value: new THREE.Vector2() }, // Set this in your render loop
+                blurAmount: { value: 1.5 } // Adjust this value for the blur intensity
+            },
+            vertexShader: `
+                varying vec2 vUv;
+
+                void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform vec2 resolution;
+                uniform float blurAmount;
+
+                varying vec2 vUv;
+                
+                void main() {
+
+                    vec3 col = texture2D(tDiffuse, vUv).rgb;
+
+                    gl_FragColor = vec4(col, 1.0);
+                }          
+            `,
+        })
+
+        this.blurMesh = new THREE.Mesh(this.blurGeometry, this.blurMaterial);
+
+        this.scene.add(this.blurMesh);
     }
 
     debugFolder()
@@ -392,13 +431,18 @@ export default class World
                 this.renderer.progress,
                 this.renderer.height,
                 this.renderer.step,
-                this.light.modes.debug.arcRotation
+                this.light.arcRotation
             );
         }
 
         if(this.customMaterial)
         {
             this.customMaterial.uniforms.uTexture.value = this.renderer.textureSceneTarget.texture;
+        }
+
+        if(this.blurMaterial)
+        {
+            
         }
 
     }
