@@ -21,7 +21,7 @@ export default class Light
         this.arcRotation = this.renderer.prng()
 
         this.setInstance()
-        // this.setModes()
+        this.setModes()
         this.setTimeAnimation()
     }
 
@@ -77,7 +77,7 @@ export default class Light
         this.modes.debug.instance.color = this.instance.color
         this.modes.debug.arcRotation = this.arcRotation
 
-        this.currentColor = this.modes.debug.instance.color.clone();
+        this.currentColor = this.instance.color.clone();
     }
 
     setTimeAnimation()
@@ -101,13 +101,13 @@ export default class Light
          * @param {Debug} PARAMS
          */
         this.PARAMS = {
-            intensity: this.modes.debug.instance.intensity,
-            color: this.modes.debug.instance.color,
-            x: this.modes.debug.instance.position.x,
-            y: this.modes.debug.instance.position.y,
-            z: this.modes.debug.instance.position.z,
+            intensity: this.instance.intensity,
+            color: this.instance.color,
+            x: this.instance.position.x,
+            y: this.instance.position.y,
+            z: this.instance.position.z,
             ambientIntensity: this.AmbientLight.intensity,
-            arcRotation: this.modes.debug.arcRotation,
+            arcRotation: this.arcRotation,
             ShadowMapViewer: true,
         }
 
@@ -172,20 +172,20 @@ export default class Light
     {
 
         // Ambient Light intensity
-        // const currentIntensity = this.maxIntensity + (this.minIntensity - this.maxIntensity) * Math.abs(0.5 - this.arcRotation) * 2;
-        // this.AmbientLight.intensity = currentIntensity;
+        const currentIntensity = this.maxIntensity + (this.minIntensity - this.maxIntensity) * Math.abs(0.5 - this.arcRotation) * 2;
+        this.AmbientLight.intensity = currentIntensity;
 
-        // const radius = 5;
-        // const centerX = 0;
-        // const centerZ = 0;
-        // const x = centerX + radius * Math.cos(Math.PI * this.arcRotation);
-        // const y = centerZ + radius * Math.sin(Math.PI * this.arcRotation);
-        // this.instance.position.set(x, y, -3);
+        const radius = 5;
+        const centerX = 0;
+        const centerZ = 0;
+        const x = centerX + radius * Math.cos(Math.PI * this.arcRotation);
+        const y = centerZ + radius * Math.sin(Math.PI * this.arcRotation);
+        this.instance.position.set(x, y, -3);
 
-        // const dayColor = this.currentColor;
-        // const currentColor = new Color();
-        // currentColor.lerpColors(dayColor, this.nightColor, Math.abs(0.5 - this.arcRotation) * 2);
-        // this.instance.color.copy(currentColor);
+        const dayColor = this.currentColor;
+        const currentColor = new Color();
+        currentColor.lerpColors(dayColor, this.nightColor, Math.abs(0.5 - this.arcRotation) * 2);
+        this.instance.color.copy(currentColor);
 
 
         // // Update debug
