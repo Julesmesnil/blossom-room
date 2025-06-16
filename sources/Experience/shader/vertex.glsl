@@ -13,6 +13,9 @@ varying float vStep;
 varying vec3 vColor1;
 varying vec3 vColor2;
 
+// Includes Three.js pour le fog
+#include <fog_pars_vertex>
+
 float PI = 3.141592653689793238;
 
 
@@ -24,6 +27,10 @@ void main() {
   vColor1 = uColor1;
   vColor2 = uColor2;
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+
+  // Calcul de la distance pour le fog
+  #include <fog_vertex>
 
 }
