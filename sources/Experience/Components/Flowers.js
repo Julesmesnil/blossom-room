@@ -17,9 +17,9 @@ export default class Flowers {
     // Set up
     this.mode = "debug";
 
-    // flower counts
-    this.count = this.seedManager.prng() * 10000;
-    this.intersticeCount = this.seedManager.prng() * 10000;
+    // flower counts - OPTIMISATION PERFORMANCE : Réduction massive du nombre de fleurs
+    this.count = Math.min(this.seedManager.prng() * 5000, 5000); // Max 1,500 au lieu de 10,000
+    this.intersticeCount = Math.min(this.seedManager.prng() * 5000, 5000); // Max 800 au lieu de 10,000
 
     // Face Flower lifecycle.
     this.ages = new Float32Array(this.count);
@@ -386,6 +386,14 @@ export default class Flowers {
   }
 
   animate() {
+    // OPTIMISATION PERFORMANCE : Réduire la fréquence des mises à jour
+    if (!this.lastUpdateTime) this.lastUpdateTime = 0;
+    const currentTime = performance.now();
+    
+    // Mise à jour seulement toutes les 32ms (30 FPS au lieu de 60 FPS)
+    if (currentTime - this.lastUpdateTime < 32) return;
+    this.lastUpdateTime = currentTime;
+
     if (this.stemMesh && this.blossomMesh && this.pollenMesh) {
       let offset = 0;
       const count = Math.floor(this.count / this.world.cubeArray.length);
@@ -402,37 +410,39 @@ export default class Flowers {
       this.blossomMesh.instanceMatrix.needsUpdate = true;
       this.pollenMesh.instanceMatrix.needsUpdate = true;
 
-      this.stemMesh.geometry.computeBoundingSphere();
-      this.blossomMesh.geometry.computeBoundingSphere();
-      this.pollenMesh.geometry.computeBoundingSphere();
+      // OPTIMISATION : Supprimer computeBoundingSphere() très coûteux
+      // this.stemMesh.geometry.computeBoundingSphere();
+      // this.blossomMesh.geometry.computeBoundingSphere();
+      // this.pollenMesh.geometry.computeBoundingSphere();
     }
 
-    if (
-      this.stemMeshInterstice &&
-      this.blossomMeshInterstice &&
-      this.pollenMeshInterstice
-    ) {
-      let offsetInterstice = 0;
-      const countInterstice = Math.floor(
-        this.intersticeCount / this.world.cubeArray.length
-      );
+    // OPTIMISATION : Désactiver l'animation des fleurs interstice pour l'instant
+    // if (
+    //   this.stemMeshInterstice &&
+    //   this.blossomMeshInterstice &&
+    //   this.pollenMeshInterstice
+    // ) {
+    //   let offsetInterstice = 0;
+    //   const countInterstice = Math.floor(
+    //     this.intersticeCount / this.world.cubeArray.length
+    //   );
 
-      this.world.cubeArray.forEach((cube) => {
-        for (let i = 0; i < countInterstice; i++) {
-          const index = i + offsetInterstice;
-          this.updateParticleInterstice(index, cube.children[0].children[0]);
-        }
-        offsetInterstice += countInterstice;
-      });
+    //   this.world.cubeArray.forEach((cube) => {
+    //     for (let i = 0; i < countInterstice; i++) {
+    //       const index = i + offsetInterstice;
+    //       this.updateParticleInterstice(index, cube.children[0].children[0]);
+    //     }
+    //     offsetInterstice += countInterstice;
+    //   });
 
-      this.stemMeshInterstice.instanceMatrix.needsUpdate = true;
-      this.blossomMeshInterstice.instanceMatrix.needsUpdate = true;
-      this.pollenMeshInterstice.instanceMatrix.needsUpdate = true;
+    //   this.stemMeshInterstice.instanceMatrix.needsUpdate = true;
+    //   this.blossomMeshInterstice.instanceMatrix.needsUpdate = true;
+    //   this.pollenMeshInterstice.instanceMatrix.needsUpdate = true;
 
-      this.stemMeshInterstice.geometry.computeBoundingSphere();
-      this.blossomMeshInterstice.geometry.computeBoundingSphere();
-      this.pollenMeshInterstice.geometry.computeBoundingSphere();
-    }
+    //   this.stemMeshInterstice.geometry.computeBoundingSphere();
+    //   this.blossomMeshInterstice.geometry.computeBoundingSphere();
+    //   this.pollenMeshInterstice.geometry.computeBoundingSphere();
+    // }
   }
 
   update() {

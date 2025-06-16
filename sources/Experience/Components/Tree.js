@@ -17,8 +17,8 @@ export default class Tree {
     // Set up
     this.mode = "debug";
 
-    // tree counts
-    this.count = this.seedManager.prng() * 500;
+    // tree counts - OPTIMISATION PERFORMANCE : Réduction du nombre de sapins
+    this.count = Math.min(this.seedManager.prng() * 300, 300); // Max 200 au lieu de 500
 
     this.ages = new Float32Array(this.count);
     this.scales = new Float32Array(this.count);
@@ -40,6 +40,7 @@ export default class Tree {
     this.sapin.traverse((o) => {
       if (o.isMesh) {
         o.castShadow = true;
+        o.receiveShadow = true;
       }
     });
 
@@ -47,6 +48,7 @@ export default class Tree {
     this.calandula.traverse((o) => {
       if (o.isMesh) {
         o.castShadow = true;
+        o.receiveShadow = true;
       }
     });
 
@@ -82,6 +84,12 @@ export default class Tree {
       this.blossomMaterial,
       this.count
     );
+
+    // Activer les ombres pour les sapins
+    this.stemMesh.castShadow = true;
+    // this.stemMesh.receiveShadow = true;
+    this.blossomMesh.castShadow = true;
+    // this.blossomMesh.receiveShadow = true;
 
     // Assign random colors to the blossoms.
     this.color = new THREE.Color();
