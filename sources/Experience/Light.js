@@ -34,12 +34,12 @@ export default class Light
         this.instance.castShadow = true
         this.instance.shadow.camera.near = -2
         this.instance.shadow.camera.far = 10
-        this.instance.shadow.camera.left = -2
-        this.instance.shadow.camera.right = 3
-        this.instance.shadow.camera.top = 1.5
-        this.instance.shadow.camera.bottom = -2
-        this.instance.shadow.mapSize.width = 1024 // put high res button : 4096
-        this.instance.shadow.mapSize.height = 1024 // put high res button : 4096
+        this.instance.shadow.camera.left = -3
+        this.instance.shadow.camera.right = 4
+        this.instance.shadow.camera.top = 2
+        this.instance.shadow.camera.bottom = -3
+        this.instance.shadow.mapSize.width = 1024
+        this.instance.shadow.mapSize.height = 1024
         this.instance.shadow.normalBias = 0.0001
         this.instance.intensity = 2
         this.scene.add(this.instance)
