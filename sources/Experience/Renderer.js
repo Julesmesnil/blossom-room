@@ -39,6 +39,12 @@ export default class Renderer
         
         this.usePostprocess = false
 
+        // OPTIMISATION : Système de performance adaptive
+        this.performanceMode = 'auto' // 'high', 'medium', 'low', 'auto'
+        this.frameCount = 0
+        this.fpsHistory = []
+        this.lastFPSCheck = performance.now()
+
         this.setInstance()
         // this.setPostProcess()
         // this.makeTextureScene()
@@ -111,6 +117,8 @@ export default class Renderer
         this.instance = new THREE.WebGLRenderer({
             // alpha: false,
             antialias: true,
+            powerPreference: "high-performance",
+            stencil: false,
         })
         this.instance.domElement.style.position = 'absolute'
         this.instance.domElement.style.top = 0
@@ -120,16 +128,18 @@ export default class Renderer
 
         this.instance.setClearColor(this.background, 1)
         this.instance.setSize(this.config.width, this.config.height)
-        this.instance.setPixelRatio(this.config.pixelRatio)
+        this.instance.setPixelRatio(Math.min(this.config.pixelRatio, 2))
 
         this.instance.physicallyCorrectLights = false
         this.instance.outputColorSpace = THREE.SRGBColorSpace
         this.instance.toneMapping = THREE.ACESFilmicToneMapping
         this.instance.toneMappingExposure = 1
         
+        THREE.ColorManagement.enabled = true
+        
         this.instance.shadowMap.enabled = true
-        this.instance.shadowMap.type = THREE.PCFSoftShadowMap
-        // this.instance.shadowMap.autoUpdate = true
+        this.instance.shadowMap.type = THREE.BasicShadowMap
+        this.instance.shadowMap.autoUpdate = true
 
         this.context = this.instance.getContext()
 
@@ -209,8 +219,53 @@ export default class Renderer
         this.postProcess.composer.setPixelRatio(this.config.pixelRatio)
     }
 
+    checkPerformance()
+    {
+        this.frameCount++
+        const now = performance.now()
+        
+        // Vérifier les FPS toutes les secondes
+        if (now - this.lastFPSCheck > 1000) {
+            const fps = this.frameCount
+            this.fpsHistory.push(fps)
+            this.frameCount = 0
+            this.lastFPSCheck = now
+            
+            // Garder seulement les 5 dernières mesures
+            if (this.fpsHistory.length > 5) {
+                this.fpsHistory.shift()
+            }
+            
+            // Calculer la moyenne
+            const avgFPS = this.fpsHistory.reduce((a, b) => a + b, 0) / this.fpsHistory.length
+            
+            // Ajuster automatiquement la qualité
+            if (this.performanceMode === 'auto') {
+                if (avgFPS < 30) {
+                    // Performance faible - réduire la qualité
+                    this.instance.setPixelRatio(1)
+                    this.instance.shadowMap.enabled = false
+                    console.log('🔴 Performance mode: LOW')
+                } else if (avgFPS < 45) {
+                    // Performance moyenne - qualité réduite
+                    this.instance.setPixelRatio(1.5)
+                    this.instance.shadowMap.enabled = true
+                    console.log('🟡 Performance mode: MEDIUM')
+                } else {
+                    // Bonne performance - qualité normale
+                    this.instance.setPixelRatio(Math.min(this.config.pixelRatio, 2))
+                    this.instance.shadowMap.enabled = true
+                    console.log('🟢 Performance mode: HIGH')
+                }
+            }
+        }
+    }
+
     update()
     {
+        // OPTIMISATION : Vérifier les performances
+        this.checkPerformance()
+
         if(this.stats)
         {
             this.stats.beforeRender()
