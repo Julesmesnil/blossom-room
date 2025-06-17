@@ -333,7 +333,7 @@ export default class Renderer
     setupFog()
     {
         // FOG DYNAMIQUE : Couleur qui suit le cycle jour/nuit comme le Sky
-        const fogColor = new THREE.Color('#f5f5f5') // Couleur de jour plus claire et moins jaune
+        const fogColor = new THREE.Color('#E1D3B3') // Couleur harmonisée avec le ciel de jour
         const fogNear = 5.0 // Augmenté pour réduire l'intensité (commence plus loin)
         const fogFar = 9.0 // Légèrement augmenté aussi
         
@@ -347,9 +347,9 @@ export default class Renderer
         this.fogNear = fogNear
         this.fogFar = fogFar
         
-        // Couleurs cibles pour la transition jour/nuit (comme le Sky)
-        this.fogDayColor = new THREE.Color('#f5f5f5') // Jour - gris très clair
-        this.fogNightColor = new THREE.Color('#3a4a5a') // Nuit - gris bleuté plus clair (au lieu de très sombre)
+        // Couleurs cibles pour la transition jour/nuit (harmonisées avec le Sky)
+        this.fogDayColor = new THREE.Color('#E1D3B3') // Jour - beige comme le Sky (uColor1)
+        this.fogNightColor = new THREE.Color('#4140C2') // Nuit - bleu comme le Sky (targetColor1)
     }
 
     // Méthode pour ajuster le fog dynamiquement (mise à jour pour fog linéaire)
