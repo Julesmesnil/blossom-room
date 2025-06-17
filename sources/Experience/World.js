@@ -445,6 +445,12 @@ export default class World
             
         }
 
+        // ANIMATION VENT : Mettre à jour l'animation des sapins
+        if(this.Tree)
+        {
+            this.Tree.update()
+        }
+
     }
 
     destroy()
