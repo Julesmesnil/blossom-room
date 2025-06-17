@@ -307,17 +307,36 @@ export default class World
 
     createSky()
     {
-
         this.skyMaterial = new Sky({
-            // wirefrale: true,
+            wireframe: false, // Désactiver le wireframe pour voir le shader
+            side: THREE.DoubleSide, // Rendre les deux côtés visibles pour débugger
         })
-        this.geometry = new THREE.PlaneGeometry(2, 1.5, 20, 20)
+        
+        // SKYBOX SPHÉRIQUE : Créer une grande sphère qui entoure toute la scène
+        this.geometry = new THREE.SphereGeometry(3.8, 32, 16) // Rayon 4 pour la bonne taille
+        
+        // Méthode alternative : inverser les normales manuellement
+        const positions = this.geometry.attributes.position.array
+        const normals = this.geometry.attributes.normal.array
+        
+        // Inverser toutes les normales
+        for (let i = 0; i < normals.length; i += 3) {
+            normals[i] *= -1     // x
+            normals[i + 1] *= -1 // y  
+            normals[i + 2] *= -1 // z
+        }
+        
+        // Inverser l'ordre des faces pour le culling
+        this.geometry.scale(-1, 1, 1)
+        
         this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
-
-        this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
-        this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
-
-        this.sky.position.set(0, .50, -3.6)
+        
+        // Centrer la sphère sur la scène
+        this.sky.position.set(0, 0, 0)
+        
+        // Rendre la sphère non-affectée par les transformations de caméra (toujours au fond)
+        this.sky.renderOrder = -1000
+        
         this.scene.add(this.sky)
     }
 

@@ -23,10 +23,16 @@ vec3 getGradient(vec4 c1, vec4 c2, float value_) {
 
 void main() {
 
+  // SKYBOX SPHÉRIQUE : Utiliser la position Y normalisée au lieu des UVs  
+  // Normaliser la position Y entre 0 et 1 (supposant que la sphère va de -10 à +10)
+  float normalizedY = (vPosition.y + 5.0) / 10.0;
+  // Clamper pour éviter les valeurs hors limites
+  normalizedY = clamp(normalizedY, 0.0, 1.0);
+
   vec3 col = getGradient(
               vec4(vec3(vColor1), 0.0),
               vec4(vec3(vColor2), .4),
-					    vUv.y
+					    normalizedY
 				    );
 
   gl_FragColor = vec4( col, 1.0 );

@@ -201,6 +201,13 @@ export default class Renderer
                 .on('change', (ev) => {
                     this.updateFog(null, ev.value, null)
                 })
+
+            // Contrôles pour l'adaptation fog selon caméra
+            this.PARAMS.fogAdaptation = true
+            this.debugFolder.addBinding(this.PARAMS, 'fogAdaptation')
+                .on('change', (ev) => {
+                    this.fogAdaptationEnabled = ev.value
+                })
         }
     }
 
@@ -298,6 +305,11 @@ export default class Renderer
             this.updateFogColor(this.experience.light.arcRotation)
         }
 
+        // ADAPTATION FOG SELON ZOOM : Adapter le fog selon la position de la caméra
+        if (this.fogAdaptationEnabled && this.experience.camera && this.experience.camera.instance) {
+            this.adaptFogToCamera()
+        }
+
         if(this.stats)
         {
             this.stats.beforeRender()
@@ -350,6 +362,9 @@ export default class Renderer
         // Couleurs cibles pour la transition jour/nuit (harmonisées avec le Sky)
         this.fogDayColor = new THREE.Color('#E1D3B3') // Jour - beige comme le Sky (uColor1)
         this.fogNightColor = new THREE.Color('#4140C2') // Nuit - bleu comme le Sky (targetColor1)
+        
+        // ADAPTATION FOG SELON ZOOM : Activer l'adaptation par défaut
+        this.fogAdaptationEnabled = true
     }
 
     // Méthode pour ajuster le fog dynamiquement (mise à jour pour fog linéaire)
@@ -400,6 +415,37 @@ export default class Renderer
             this.scene.fog.color.copy(lerpedFogColor);
             this.scene.fog.near = lerpedFogNear;
             this.instance.setClearColor(lerpedFogColor, 1);
+        }
+    }
+
+    // ADAPTATION FOG SELON ZOOM : Méthode pour maintenir le fog aux mêmes coordonnées absolues
+    adaptFogToCamera()
+    {
+        if (!this.scene.fog) return;
+
+        const cameraZ = this.experience.camera.instance.position.z;
+        
+        // Valeurs de base (quand caméra à Z = 3.5)
+        const baseFogNear = 5.0;
+        const baseFogFar = 9.0;
+        const baseCameraZ = 3.5;
+        
+        // COMPENSATION EXACTE : Le fog doit rester aux mêmes coordonnées absolues dans l'espace monde
+        // Si la caméra bouge de X unités, on ajuste le fog de X unités pour qu'il reste au même endroit
+        const cameraMovement = cameraZ - baseCameraZ;
+        
+        // Compenser exactement le mouvement de caméra
+        // Si caméra recule de 1 unité, fog doit avancer de 1 unité pour rester au même endroit
+        const compensatedFogNear = baseFogNear + cameraMovement;
+        const compensatedFogFar = baseFogFar + cameraMovement;
+        
+        // Appliquer les nouvelles valeurs (seulement si elles ont changé significativement)
+        const threshold = 0.05; // Seuil plus fin pour plus de précision
+        if (Math.abs(this.scene.fog.near - compensatedFogNear) > threshold) {
+            this.scene.fog.near = compensatedFogNear;
+        }
+        if (Math.abs(this.scene.fog.far - compensatedFogFar) > threshold) {
+            this.scene.fog.far = compensatedFogFar;
         }
     }
 }
