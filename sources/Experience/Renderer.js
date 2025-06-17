@@ -248,9 +248,11 @@ export default class Renderer
         this.instance.setSize(this.config.width, this.config.height)
         this.instance.setPixelRatio(this.config.pixelRatio)
 
-        // Post process
-        this.postProcess.composer.setSize(this.config.width, this.config.height)
-        this.postProcess.composer.setPixelRatio(this.config.pixelRatio)
+        // Post process - Vérification de sécurité pour éviter l'erreur
+        if (this.postProcess && this.postProcess.composer) {
+            this.postProcess.composer.setSize(this.config.width, this.config.height)
+            this.postProcess.composer.setPixelRatio(this.config.pixelRatio)
+        }
     }
 
     checkPerformance()
@@ -259,7 +261,7 @@ export default class Renderer
         const now = performance.now()
         
         // Vérifier les FPS toutes les secondes
-        if (now - this.lastFPSCheck > 1000) {
+        if (now - this.lastFPSCheck > 5000) {
             const fps = this.frameCount
             this.fpsHistory.push(fps)
             this.frameCount = 0
@@ -315,7 +317,7 @@ export default class Renderer
             this.stats.beforeRender()
         }
 
-        if(this.usePostprocess)
+        if(this.usePostprocess && this.postProcess && this.postProcess.composer)
         {
             this.postProcess.composer.render()
         }
@@ -337,9 +339,15 @@ export default class Renderer
     {
         this.instance.renderLists.dispose()
         this.instance.dispose()
-        this.renderTarget.dispose()
-        this.postProcess.composer.renderTarget1.dispose()
-        this.postProcess.composer.renderTarget2.dispose()
+        
+        if (this.renderTarget) {
+            this.renderTarget.dispose()
+        }
+        
+        if (this.postProcess && this.postProcess.composer) {
+            this.postProcess.composer.renderTarget1.dispose()
+            this.postProcess.composer.renderTarget2.dispose()
+        }
     }
 
     setupFog()

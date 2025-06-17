@@ -420,7 +420,7 @@ export default class World
         this.planeMaterial = new THREE.MeshStandardMaterial({
             color: this.colorSettings.color2Hex,
         })
-        this.geometry = new THREE.PlaneGeometry(3, 4, 20, 20)
+        this.geometry = new THREE.PlaneGeometry(4, 4, 1, 1)
         this.geometry.rotateX(-Math.PI * 0.5)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
