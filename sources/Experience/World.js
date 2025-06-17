@@ -5,6 +5,7 @@ import Experience from './Experience.js'
 import Sky from './Components/Sky.js'
 import Flowers from './Components/Flowers.js'
 import Tree from './Components/Tree.js'
+import Grass from './Components/Grass.js'
 
 export default class World
 {
@@ -43,6 +44,7 @@ export default class World
             {
                 this.createPoints()
                 this.createFloors()
+                this.createGrass()
                 this.createRoom()
                 this.createSky()
                 // this.createMorph()
@@ -305,6 +307,11 @@ export default class World
         this.scene.add(this.room)
     }
 
+    createGrass()
+    {
+        this.grass = new Grass()
+    }
+
     createSky()
     {
         this.skyMaterial = new Sky({
@@ -468,6 +475,12 @@ export default class World
         if(this.Tree)
         {
             this.Tree.update()
+        }
+
+        // ANIMATION HERBE : Mettre à jour l'animation de l'herbe
+        if(this.grass)
+        {
+            this.grass.update()
         }
 
     }
