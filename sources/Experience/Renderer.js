@@ -201,6 +201,13 @@ export default class Renderer
                 .on('change', (ev) => {
                     this.updateFog(null, ev.value, null)
                 })
+
+            // Contrôles pour l'adaptation fog selon caméra
+            this.PARAMS.fogAdaptation = true
+            this.debugFolder.addBinding(this.PARAMS, 'fogAdaptation')
+                .on('change', (ev) => {
+                    this.fogAdaptationEnabled = ev.value
+                })
         }
     }
 
@@ -241,9 +248,11 @@ export default class Renderer
         this.instance.setSize(this.config.width, this.config.height)
         this.instance.setPixelRatio(this.config.pixelRatio)
 
-        // Post process
-        this.postProcess.composer.setSize(this.config.width, this.config.height)
-        this.postProcess.composer.setPixelRatio(this.config.pixelRatio)
+        // Post process - Vérification de sécurité pour éviter l'erreur
+        if (this.postProcess && this.postProcess.composer) {
+            this.postProcess.composer.setSize(this.config.width, this.config.height)
+            this.postProcess.composer.setPixelRatio(this.config.pixelRatio)
+        }
     }
 
     checkPerformance()
@@ -252,7 +261,7 @@ export default class Renderer
         const now = performance.now()
         
         // Vérifier les FPS toutes les secondes
-        if (now - this.lastFPSCheck > 1000) {
+        if (now - this.lastFPSCheck > 5000) {
             const fps = this.frameCount
             this.fpsHistory.push(fps)
             this.frameCount = 0
@@ -298,12 +307,17 @@ export default class Renderer
             this.updateFogColor(this.experience.light.arcRotation)
         }
 
+        // ADAPTATION FOG SELON ZOOM : Adapter le fog selon la position de la caméra
+        if (this.fogAdaptationEnabled && this.experience.camera && this.experience.camera.instance) {
+            this.adaptFogToCamera()
+        }
+
         if(this.stats)
         {
             this.stats.beforeRender()
         }
 
-        if(this.usePostprocess)
+        if(this.usePostprocess && this.postProcess && this.postProcess.composer)
         {
             this.postProcess.composer.render()
         }
@@ -325,15 +339,21 @@ export default class Renderer
     {
         this.instance.renderLists.dispose()
         this.instance.dispose()
-        this.renderTarget.dispose()
-        this.postProcess.composer.renderTarget1.dispose()
-        this.postProcess.composer.renderTarget2.dispose()
+        
+        if (this.renderTarget) {
+            this.renderTarget.dispose()
+        }
+        
+        if (this.postProcess && this.postProcess.composer) {
+            this.postProcess.composer.renderTarget1.dispose()
+            this.postProcess.composer.renderTarget2.dispose()
+        }
     }
 
     setupFog()
     {
         // FOG DYNAMIQUE : Couleur qui suit le cycle jour/nuit comme le Sky
-        const fogColor = new THREE.Color('#f5f5f5') // Couleur de jour plus claire et moins jaune
+        const fogColor = new THREE.Color('#E1D3B3') // Couleur harmonisée avec le ciel de jour
         const fogNear = 5.0 // Augmenté pour réduire l'intensité (commence plus loin)
         const fogFar = 9.0 // Légèrement augmenté aussi
         
@@ -347,9 +367,12 @@ export default class Renderer
         this.fogNear = fogNear
         this.fogFar = fogFar
         
-        // Couleurs cibles pour la transition jour/nuit (comme le Sky)
-        this.fogDayColor = new THREE.Color('#f5f5f5') // Jour - gris très clair
-        this.fogNightColor = new THREE.Color('#3a4a5a') // Nuit - gris bleuté plus clair (au lieu de très sombre)
+        // Couleurs cibles pour la transition jour/nuit (harmonisées avec le Sky)
+        this.fogDayColor = new THREE.Color('#E1D3B3') // Jour - beige comme le Sky (uColor1)
+        this.fogNightColor = new THREE.Color('#4140C2') // Nuit - bleu comme le Sky (targetColor1)
+        
+        // ADAPTATION FOG SELON ZOOM : Activer l'adaptation par défaut
+        this.fogAdaptationEnabled = true
     }
 
     // Méthode pour ajuster le fog dynamiquement (mise à jour pour fog linéaire)
@@ -400,6 +423,37 @@ export default class Renderer
             this.scene.fog.color.copy(lerpedFogColor);
             this.scene.fog.near = lerpedFogNear;
             this.instance.setClearColor(lerpedFogColor, 1);
+        }
+    }
+
+    // ADAPTATION FOG SELON ZOOM : Méthode pour maintenir le fog aux mêmes coordonnées absolues
+    adaptFogToCamera()
+    {
+        if (!this.scene.fog) return;
+
+        const cameraZ = this.experience.camera.instance.position.z;
+        
+        // Valeurs de base (quand caméra à Z = 3.5)
+        const baseFogNear = 5.0;
+        const baseFogFar = 9.0;
+        const baseCameraZ = 3.5;
+        
+        // COMPENSATION EXACTE : Le fog doit rester aux mêmes coordonnées absolues dans l'espace monde
+        // Si la caméra bouge de X unités, on ajuste le fog de X unités pour qu'il reste au même endroit
+        const cameraMovement = cameraZ - baseCameraZ;
+        
+        // Compenser exactement le mouvement de caméra
+        // Si caméra recule de 1 unité, fog doit avancer de 1 unité pour rester au même endroit
+        const compensatedFogNear = baseFogNear + cameraMovement;
+        const compensatedFogFar = baseFogFar + cameraMovement;
+        
+        // Appliquer les nouvelles valeurs (seulement si elles ont changé significativement)
+        const threshold = 0.05; // Seuil plus fin pour plus de précision
+        if (Math.abs(this.scene.fog.near - compensatedFogNear) > threshold) {
+            this.scene.fog.near = compensatedFogNear;
+        }
+        if (Math.abs(this.scene.fog.far - compensatedFogFar) > threshold) {
+            this.scene.fog.far = compensatedFogFar;
         }
     }
 }

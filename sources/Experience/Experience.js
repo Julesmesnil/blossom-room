@@ -14,6 +14,7 @@ import Camera from './Camera.js'
 import Light from './Light.js'
 import World from './World.js'
 import Sound from './Components/Sound.js';
+import ScrollEvent from './ScrollEvent.js';
 
 import assets from './assets.js'
 
@@ -45,6 +46,7 @@ export default class Experience
         this.seedManager()
         this.setStats()
         this.setScene()
+        this.setScrollEvent()
         this.setCamera()
         this.setColorSettings()
         this.setSound()
@@ -52,7 +54,6 @@ export default class Experience
         this.setLight()
         this.setResources()
         this.setWorld()
-        
         this.sizes.on('resize', () =>
         {
             this.resize()
@@ -152,6 +153,11 @@ export default class Experience
         this.world = new World()
     }
 
+    setScrollEvent()
+    {
+        this.scrollEvent = new ScrollEvent()
+    }
+
     update()
     {
         if(this.stats)
@@ -170,6 +176,9 @@ export default class Experience
 
         if(this.light)
             this.light.update()
+
+        if(this.scrollEvent)
+            this.scrollEvent.update()
 
         window.requestAnimationFrame(() =>
         {

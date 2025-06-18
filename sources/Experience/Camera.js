@@ -13,6 +13,7 @@ export default class Camera
         this.sizes = this.experience.sizes
         this.targetElement = this.experience.targetElement
         this.scene = this.experience.scene
+        this.scrollEvent = this.experience.scrollEvent        
 
         // Set up
         this.mode = 'debug' // defaultCamera \ debugCamera
@@ -200,7 +201,13 @@ export default class Camera
         // Apply coordinates
         this.instance.position.copy(this.modes[this.mode].instance.position)
         this.instance.quaternion.copy(this.modes[this.mode].instance.quaternion)
+        
+        // Limiter le déplacement Z autour de la position initiale (2.5 à 4.5)
+        const targetZ = -this.scrollEvent.current
+        this.instance.position.z = THREE.MathUtils.clamp(targetZ, 1.5, 3.5)
+        
         this.instance.updateMatrixWorld() // To be used in projection
+
     }
 
     destroy()

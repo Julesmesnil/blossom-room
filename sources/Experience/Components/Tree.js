@@ -24,6 +24,11 @@ export default class Tree {
     this.scales = new Float32Array(this.count);
     this.dummy = new THREE.Object3D();
 
+    // ANIMATION VENT : Stockage des données d'animation optimisé
+    this.baseRotations = new Float32Array(this.count * 3); // x, y, z pour chaque sapin
+    this.windOffsets = new Float32Array(this.count); // Décalage temporel pour chaque sapin
+    this.windStrengths = new Float32Array(this.count); // Intensité du vent pour chaque sapin
+
     this._position = new THREE.Vector3();
     this._normal = new THREE.Vector3();
     this._scale = new THREE.Vector3();
@@ -123,7 +128,12 @@ export default class Tree {
     this.scene.add(this.stemMesh);
     this.scene.add(this.blossomMesh);
 
-    // this.debugFolder();
+    // ANIMATION VENT : Variables de contrôle
+    this.windEnabled = true;
+    this.windSpeed = 0.8;
+    this.windStrength = 0.15;
+
+    this.debugFolder();
 
     // this.update();
   }
@@ -143,6 +153,10 @@ export default class Tree {
       // debug
       this.ages[i] = this.seedManager.prng();
       this.scales[i] = this.scaleCurve(this.ages[i]);
+
+      // ANIMATION VENT : Initialiser les paramètres de vent pour chaque sapin
+      this.windOffsets[i] = this.seedManager.prng() * Math.PI * 2; // Décalage temporel aléatoire
+      this.windStrengths[i] = 0.3 + this.seedManager.prng() * 0.4; // Intensité entre 0.3 et 0.7
 
       this.resampleParticle(i, this.world.plane);
     }
@@ -170,6 +184,11 @@ export default class Tree {
     this.dummy.rotation.set(Math.PI * 0.5, 0, 0);
     // this.dummy.scale.set(this.scales[i], this.scales[i], this.scales[i]);
     // this.dummy.lookAt(this._normal);
+
+    // ANIMATION VENT : Stocker la rotation de base pour l'animation
+    this.baseRotations[i * 3] = this.dummy.rotation.x;
+    this.baseRotations[i * 3 + 1] = this.dummy.rotation.y;
+    this.baseRotations[i * 3 + 2] = this.dummy.rotation.z;
 
     this.dummy.updateMatrix();
 
@@ -203,13 +222,80 @@ export default class Tree {
     /**
      * @param {Debug} PARAMS
      */
-    this.PARAMS = {};
+    this.PARAMS = {
+      windEnabled: true,
+      windSpeed: 0.8,
+      windStrength: 0.15
+    };
+
+    if(this.debug) {
+      this.debugFolder = this.debug.addFolder({
+        title: 'Animation Vent',
+        expanded: false,
+      });
+
+      this.debugFolder.addBinding(this.PARAMS, 'windEnabled')
+        .on('change', (ev) => {
+          this.windEnabled = ev.value;
+        });
+
+      this.debugFolder.addBinding(this.PARAMS, 'windSpeed', { min: 0.1, max: 2.0, step: 0.1 })
+        .on('change', (ev) => {
+          this.windSpeed = ev.value;
+        });
+
+      this.debugFolder.addBinding(this.PARAMS, 'windStrength', { min: 0.05, max: 0.5, step: 0.05 })
+        .on('change', (ev) => {
+          this.windStrength = ev.value;
+        });
+    }
   }
 
   update() {
     this.deltaTime = this.time - window.performance.now();
     this.elapsedTime = window.performance.now() * 0.001;
     this.time = window.performance.now();
+
+    // ANIMATION VENT : Animer les sapins seulement si activé et performances suffisantes
+    if (this.windEnabled && this.renderer.performanceMode !== 'low') {
+      this.animateWind();
+    }
+  }
+
+  // ANIMATION VENT : Méthode optimisée pour animer le vent
+  animateWind() {
+    const time = this.elapsedTime;
+    const windSpeed = this.windSpeed; // Vitesse du vent (plus bas = plus lent)
+    const windStrength = this.windStrength; // Force globale du vent (plus bas = plus subtil)
+    
+    // Optimisation : Animer seulement 1 sapin sur 2 à chaque frame (60fps -> 30fps pour l'animation)
+    const startIndex = Math.floor(time * 30) % 2; // Alterne entre 0 et 1
+    
+    for (let i = startIndex; i < this.count; i += 2) {
+      // Calcul de l'oscillation du vent avec décalage temporel unique
+      const windTime = time * windSpeed + this.windOffsets[i];
+      const windX = Math.sin(windTime) * windStrength * this.windStrengths[i];
+      const windY = Math.sin(windTime * 0.7 + this.windOffsets[i] * 0.5) * windStrength * this.windStrengths[i] * 0.6;
+      
+      // Récupérer la matrice actuelle pour garder position et échelle
+      this.stemMesh.getMatrixAt(i, this.dummy.matrix);
+      this.dummy.matrix.decompose(this.dummy.position, this.dummy.quaternion, this.dummy.scale);
+      
+      // Appliquer l'animation de vent à partir de la rotation de base
+      this.dummy.rotation.x = this.baseRotations[i * 3] + windX;
+      this.dummy.rotation.y = this.baseRotations[i * 3 + 1]+ windY;
+      this.dummy.rotation.z = this.baseRotations[i * 3 + 2];
+      
+      this.dummy.updateMatrix();
+      
+      // Mettre à jour les deux meshes (tige et feuillage)
+      this.stemMesh.setMatrixAt(i, this.dummy.matrix);
+      this.blossomMesh.setMatrixAt(i, this.dummy.matrix);
+    }
+    
+    // Marquer les matrices comme nécessitant une mise à jour
+    this.stemMesh.instanceMatrix.needsUpdate = true;
+    this.blossomMesh.instanceMatrix.needsUpdate = true;
   }
 
   destroy() {}

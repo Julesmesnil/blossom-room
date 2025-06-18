@@ -18,6 +18,15 @@ body
     height: 100vh;
 }
 
+.tap-to-randomize {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    user-select: none;
+}
+
 /* Resize TweakPane Panel */
 .tp-dfwv{
     width: 300px !important;

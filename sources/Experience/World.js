@@ -5,6 +5,7 @@ import Experience from './Experience.js'
 import Sky from './Components/Sky.js'
 import Flowers from './Components/Flowers.js'
 import Tree from './Components/Tree.js'
+import Grass from './Components/Grass.js'
 
 export default class World
 {
@@ -43,6 +44,7 @@ export default class World
             {
                 this.createPoints()
                 this.createFloors()
+                // this.createGrass()
                 this.createRoom()
                 this.createSky()
                 // this.createMorph()
@@ -305,19 +307,43 @@ export default class World
         this.scene.add(this.room)
     }
 
+    createGrass()
+    {
+        this.grass = new Grass()
+    }
+
     createSky()
     {
-
         this.skyMaterial = new Sky({
-            // wirefrale: true,
+            wireframe: false, // Désactiver le wireframe pour voir le shader
+            side: THREE.DoubleSide, // Rendre les deux côtés visibles pour débugger
         })
-        this.geometry = new THREE.PlaneGeometry(2, 1.5, 20, 20)
+        
+        // SKYBOX SPHÉRIQUE : Créer une grande sphère qui entoure toute la scène
+        this.geometry = new THREE.SphereGeometry(3.9, 32, 16) // Rayon 4 pour la bonne taille
+        
+        // Méthode alternative : inverser les normales manuellement
+        const positions = this.geometry.attributes.position.array
+        const normals = this.geometry.attributes.normal.array
+        
+        // Inverser toutes les normales
+        for (let i = 0; i < normals.length; i += 3) {
+            normals[i] *= -1     // x
+            normals[i + 1] *= -1 // y  
+            normals[i + 2] *= -1 // z
+        }
+        
+        // Inverser l'ordre des faces pour le culling
+        this.geometry.scale(-1, 1, 1)
+        
         this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
-
-        this.geometry = new THREE.PlaneGeometry(3, 2, 20, 20)
-        this.sky = new THREE.Mesh(this.geometry, this.skyMaterial)
-
-        this.sky.position.set(0, .50, -3.6)
+        
+        // Centrer la sphère sur la scène
+        this.sky.position.set(0, 0, 0)
+        
+        // Rendre la sphère non-affectée par les transformations de caméra (toujours au fond)
+        this.sky.renderOrder = -1000
+        
         this.scene.add(this.sky)
     }
 
@@ -401,7 +427,7 @@ export default class World
         this.planeMaterial = new THREE.MeshStandardMaterial({
             color: this.colorSettings.color2Hex,
         })
-        this.geometry = new THREE.PlaneGeometry(3, 4, 20, 20)
+        this.geometry = new THREE.PlaneGeometry(4.2, 4, 1, 1)
         this.geometry.rotateX(-Math.PI * 0.5)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
@@ -444,6 +470,18 @@ export default class World
         {
             
         }
+
+        // ANIMATION VENT : Mettre à jour l'animation des sapins
+        if(this.Tree)
+        {
+            this.Tree.update()
+        }
+
+        // ANIMATION HERBE : Mettre à jour l'animation de l'herbe
+        // if(this.grass)
+        // {
+        //     this.grass.update()
+        // }
 
     }
 
