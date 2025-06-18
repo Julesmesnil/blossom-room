@@ -44,7 +44,7 @@ export default class World
             {
                 this.createPoints()
                 this.createFloors()
-                this.createGrass()
+                // this.createGrass()
                 this.createRoom()
                 this.createSky()
                 // this.createMorph()
@@ -320,7 +320,7 @@ export default class World
         })
         
         // SKYBOX SPHÉRIQUE : Créer une grande sphère qui entoure toute la scène
-        this.geometry = new THREE.SphereGeometry(3.8, 32, 16) // Rayon 4 pour la bonne taille
+        this.geometry = new THREE.SphereGeometry(3.9, 32, 16) // Rayon 4 pour la bonne taille
         
         // Méthode alternative : inverser les normales manuellement
         const positions = this.geometry.attributes.position.array
@@ -427,7 +427,7 @@ export default class World
         this.planeMaterial = new THREE.MeshStandardMaterial({
             color: this.colorSettings.color2Hex,
         })
-        this.geometry = new THREE.PlaneGeometry(4, 4, 1, 1)
+        this.geometry = new THREE.PlaneGeometry(4.2, 4, 1, 1)
         this.geometry.rotateX(-Math.PI * 0.5)
         this.plane = new THREE.Mesh(this.geometry, this.planeMaterial)
 
@@ -478,10 +478,10 @@ export default class World
         }
 
         // ANIMATION HERBE : Mettre à jour l'animation de l'herbe
-        if(this.grass)
-        {
-            this.grass.update()
-        }
+        // if(this.grass)
+        // {
+        //     this.grass.update()
+        // }
 
     }
 

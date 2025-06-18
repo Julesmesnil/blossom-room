@@ -27,7 +27,7 @@ export default class Sky extends ShaderMaterial {
             uHeight: { value: 0. },
             uStep: { value: 0.4 },
             uColor1: { value: new Color('#E1D3B3') },
-            uColor2: { value: new Color('#81BFE6') },
+            uColor2: { value: new Color('#52B3F0') },
             resolution: { value: new Vector4() },
         };
 

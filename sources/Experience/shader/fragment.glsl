@@ -11,33 +11,36 @@ varying vec3 vColor1;
 varying vec3 vColor2;
 
 // Includes Three.js pour le fog
-#include <fog_pars_fragment>
+// #include <fog_pars_fragment>
 
 float PI = 3.141592653689793238;
 
-vec3 getGradient(vec4 c1, vec4 c2, float value_) {
-  float blend1 = smoothstep(c1.w, c2.w, value_);
-  vec3 col = mix(c1.rgb, c2.rgb, blend1);
+vec3 getGradient(vec3 c1, vec3 c2, float value_) {
+  // Utiliser directement mix pour un dégradé simple et visible
+  vec3 col = mix(c1, c2, value_);
   return col;
 }
 
 void main() {
 
-  // SKYBOX SPHÉRIQUE : Utiliser la position Y normalisée au lieu des UVs  
-  // Normaliser la position Y entre 0 et 1 (supposant que la sphère va de -10 à +10)
-  float normalizedY = (vPosition.y + 5.0) / 10.0;
-  // Clamper pour éviter les valeurs hors limites
+  // SKYBOX SPHÉRIQUE : Dégradé du centre (sol) vers le haut uniquement
+  // Normaliser la position Y entre 0 et 1 (de Y=0 au centre jusqu'à Y=+3.9 au sommet)
+  float normalizedY = vPosition.y / 3.9;
+  // Clamper pour éviter les valeurs négatives (partie sous le sol)
   normalizedY = clamp(normalizedY, 0.0, 1.0);
+  
+  // Accélérer légèrement la transition vers la couleur2 pour un dégradé plus naturel
+  float acceleratedY = pow(normalizedY, 0.7);
 
   vec3 col = getGradient(
-              vec4(vec3(vColor1), 0.0),
-              vec4(vec3(vColor2), .4),
-					    normalizedY
+              vColor1,
+              vColor2,
+					    acceleratedY
 				    );
 
   gl_FragColor = vec4( col, 1.0 );
 
   // Application du fog
-  #include <fog_fragment>
+  // #include <fog_fragment>
 
 }
